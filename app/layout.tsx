@@ -1,5 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { camptonBook, camptonBold } from './styles/fonts'
 
 export const metadata: Metadata = {
   title: 'Mother Volcano',
@@ -13,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={camptonBook.className}>{children}</body>
     </html>
   )
 }

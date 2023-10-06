@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import styles from './page.module.css'
+import {camptonBook, camptonBold} from './styles/fonts';
+
 
 export default function Home() {
 
@@ -8,7 +10,7 @@ export default function Home() {
     <main className={styles.grid}>
 
       <div>
-        <h1>Mother Volcano</h1>
+        <h1 className={camptonBold.className}>Mother Volcano</h1>
         <h2>Eduardo Barbosa</h2>
       </div>
 
