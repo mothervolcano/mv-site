@@ -2,7 +2,6 @@
 
 declare const paper: any
 
-
 import { useRef, useEffect, useState } from 'react';
 import Script from 'next/script';
 
@@ -39,7 +38,7 @@ const PaperStage = ({
 					paper.setup(canvasRef.current);
 					onPaperLoad(true);
 
-					const path = new paper.Path.Circle({ center: paper.view.center, radius: 50, fillColor: 'black'})
+					// const path = new paper.Path.Circle({ center: paper.view.center, radius: 50, fillColor: 'black'})
 				}}
 			/>
 		</>

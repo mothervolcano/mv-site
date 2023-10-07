@@ -7,6 +7,8 @@ import {camptonBook, camptonBold} from './styles/fonts';
 import PaperStage from './components/paperStage';
 import ProjectCard from './components/ProjectCard';
 
+import {init, generate} from './demo/main';
+
 export default function Home() {
 
   const projectList = [
@@ -39,6 +41,9 @@ export default function Home() {
   const setStage = ( isPaperLoaded: boolean ) => {
 
     console.log('Is Paper Loaded? ', isPaperLoaded);
+
+    init();
+    generate();
 
   }
 
