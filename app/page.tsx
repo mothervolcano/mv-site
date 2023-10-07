@@ -35,7 +35,7 @@ export default function Home() {
 
     <main className={styles.grid}>
 
-      <div>
+      <div id="cover" className={styles.cover}>
         <h1 className={camptonBold.className}>Mother Volcano</h1>
         <h2>Eduardo Barbosa</h2>
       </div>

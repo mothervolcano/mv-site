@@ -7,7 +7,8 @@ export default function ProjectCard( props: any ) {
 	const styleGrid = {
 
 		display: 'grid',
-		gridTemplateRows: '6fr 1fr'
+		gridTemplateRows: '6fr 1fr',
+		aspectRatio: '1/1'
 	}
 
 	return (
