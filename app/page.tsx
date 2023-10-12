@@ -7,7 +7,7 @@ import {camptonBook, camptonBold} from './styles/fonts';
 import PaperStage from './components/paperStage';
 import ProjectCard from './components/ProjectCard';
 
-import {init, generate} from './demo/main';
+import {init, update, generate} from './demo/main';
 
 export default function Home() {
 
@@ -47,6 +47,14 @@ export default function Home() {
 
   }
 
+  const updateStage = ( mousePos: {x:number, y:number}) => {
+
+    init();
+    update(mousePos);
+    generate()
+
+  }
+
   return (
 
     <main className={styles.grid}>
@@ -54,7 +62,7 @@ export default function Home() {
       <div id="cover" className={styles.cover}>
         <h1 className={camptonBold.className}>Mother Volcano</h1>
         <h2>Eduardo Barbosa</h2>
-        <PaperStage onPaperLoad={setStage}/>
+        <PaperStage onPaperLoad={setStage} onMouseClick={updateStage}/>
       </div>
 
         

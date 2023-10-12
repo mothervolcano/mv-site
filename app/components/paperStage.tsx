@@ -5,16 +5,17 @@ declare const paper: any
 import { useRef, useEffect, useState } from 'react';
 import Script from 'next/script';
 
-// import { init } from '../lib/paperTest'
+import useMousePosition from '../hooks/useMousePosition';
 
 
 const PaperStage = ({ 
 
-	onPaperLoad 
+	onPaperLoad, onMouseClick 
 
 }:any ) => {
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [ mousePos, setMousePos ] = useMousePosition();
 
 	return (
 
@@ -22,7 +23,13 @@ const PaperStage = ({
 			<canvas 
 
 				style={{display: 'relative', width: '100%', height: '100%'}}
-				ref={canvasRef} 
+				ref={canvasRef}
+				onClick={ (e) => {
+
+					setMousePos( (e as unknown) as MouseEvent );
+
+					onMouseClick(mousePos);
+				}}
 			>
 				
 			</canvas>

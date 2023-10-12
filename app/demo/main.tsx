@@ -81,6 +81,13 @@ export function init() {
     layer = new paper.Layer();
 };
 
+export function update( position: {x:number,y:number}) {
+
+	origin = position;
+
+	console.log('---> CLICK! Mouse Position: ', origin);
+}
+
 
 export function generate() {
 

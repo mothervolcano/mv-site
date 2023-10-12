@@ -39,7 +39,6 @@ export class Path {
 }
 
 
-
 export class Circle {
     constructor(...args: any[]) {
         if (args.length === 0) {
