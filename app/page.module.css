@@ -1,55 +1,82 @@
-.grid {
+/* Base container and layout */
+.container {
+    width: 100%;
+    height: 100vh;
+/*    margin: 20px;*/
+    background-color: #ffffff;
+    border: 1px black solid;
+    display: grid;
+    grid-template-areas: 
+        "cover projects";
+    grid-template-columns: 3fr 4fr;
+    gap: 0px;
+}
 
-  position: relative;
+/* Cover styling */
+.cover {
+    background-color: #ECECEC;
+    border-right: 1px black solid;
+    position: relative;
+    grid-area: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+}
 
+.stage {
+
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-
-  display: grid;
-  grid-template-columns: 2fr 3fr;
-
+/*  z-index: -1;*/
 }
 
-.cover {
+.logo {
 
-  background-color: #F6F6F6;
+    align-self: start;
 }
 
-.gallery {
+.intro {
 
-  position: relative;
-
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+    padding: 20px;
 }
 
-/*.gallery > div::before {
-  content: "";
-  float: left;
-  padding-top: 100%;
-}*/
-
-.gallery > div {
-/*  aspect-ratio: 1/1;*/
-  border: 1px solid black;
+.logo, .intro {
+    position: relative;
+    z-index: 1; /* This ensures these elements stay above the canvas */
 }
 
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
+/* Project cards and grid */
+.projects {
+    grid-area: projects;
+    display: grid;
+    gap: 0px;
+    align-content: start;
+    align-items: start;
+    justify-content: start;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    background-color: #000;
 }
 
-@media (prefers-reduced-motion) {
+.project {
+    background-color: #e0e0e0;
+    border-bottom: 1px black solid;
+    border-right: 1px black solid;
+    aspect-ratio: 1; /* This keeps the card as a square */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* These flex properties center the text inside each project card */
 }
 
-/* Mobile */
-@media (max-width: 700px) {
-
+@media (max-width: 800px) {
+    .container {
+        grid-template-areas: 
+            "cover"
+            "projects";
+        grid-template-columns: 1fr; /* This makes it single column layout on smaller screens */
+    }
 }
-
-/* Tablet and Smaller Desktop */
-@media (min-width: 701px) and (max-width: 1120px) {
-}
-
