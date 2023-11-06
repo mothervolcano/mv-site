@@ -1,44 +1,48 @@
-'use client'
+"use client";
 
-declare const paper: any
+declare const paper: any;
 
-import { useRef, useEffect, useState } from 'react';
-import Script from 'next/script';
+import { useRef, useEffect, useState } from "react";
+import Script from "next/script";
 
-import useMousePosition from '../hooks/useMousePosition';
+import useMousePosition from "../hooks/useMousePosition";
 
-
-const PaperStage = ({ 
-
-	onPaperLoad, onMouseClick 
-
-}:any ) => {
-
+const PaperStage = ({ onPaperLoad, onMouseClick, onMouseMove }: any) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [ mousePos, setMousePos ] = useMousePosition();
+	const [mousePos, setMousePos] = useMousePosition();
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		const handleMouseMove = (event: MouseEvent) => {
+			setMousePos({ x: event.clientX, y: event.clientY } as MouseEvent);
+			onMouseMove(mousePos)
+		};
+
+		if (canvas) {
+			canvas.addEventListener("mousemove", handleMouseMove);
+		}
+
+		return () => {
+			if (canvas) {
+				canvas.removeEventListener("mousemove", handleMouseMove);
+			}
+		};
+	}, [setMousePos]);
 
 	return (
-
 		<>
-			<canvas 
-
-				style={{display: 'relative', width: '100%', height: '100%'}}
+			<canvas
+				style={{ position: "relative", width: "100%", height: "100%" }}
 				ref={canvasRef}
-				onClick={ (e) => {
-
-					setMousePos( (e as unknown) as MouseEvent );
-
+				onClick={(e) => {
+					setMousePos(e as unknown as MouseEvent);
 					onMouseClick(mousePos);
 				}}
-			>
-				
-			</canvas>
-			
+			></canvas>
+
 			<Script
-
-				src='../../lib/paper/paper-core.js'
+				src="../../lib/paper/paper-core.js"
 				onReady={() => {
-
 					console.log(`Paperjs is ready! --> ${paper}`);
 
 					paper.install(window);
@@ -49,10 +53,7 @@ const PaperStage = ({
 				}}
 			/>
 		</>
-	)
-}
-
+	);
+};
 
 export default PaperStage;
-
-
