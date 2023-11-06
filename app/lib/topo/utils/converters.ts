@@ -42,7 +42,7 @@ export function convertToHyperPoint( pt: PointLike ): IHyperPoint {
 
 
 
-export function validatePointInput(input: any): IPoint {
+export function validatePointInput(input: any) {
 	  
   if ( input === null ) { return new Point(0,0) };
 

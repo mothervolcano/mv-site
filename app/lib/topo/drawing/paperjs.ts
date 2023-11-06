@@ -5,11 +5,11 @@ declare const paper:any;
 export class Point {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Point(); // Instantiate with no arguments
+            return new paper.Point();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Point(args[0]); // Instantiate with a single object parameter
+            return new paper.Point(args[0]);
         } else {
-            return new paper.Point(...args); // Instantiate with other arguments
+            return new paper.Point(...args);
         }
     }
 }
@@ -17,11 +17,11 @@ export class Point {
 export class Segment {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Segment(); // Instantiate with no arguments
+            return new paper.Segment();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Segment(args[0]); // Instantiate with a single object parameter
+            return new paper.Segment(args[0]);
         } else {
-            return new paper.Segment(...args); // Instantiate with other arguments
+            return new paper.Segment(...args);
         }
     }
 }
@@ -29,11 +29,11 @@ export class Segment {
 export class Path {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Path(); // Instantiate with no arguments
+            return new paper.Path();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Path(args[0]); // Instantiate with a single object parameter
+            return new paper.Path(args[0]);
         } else {
-            return new paper.Path(...args); // Instantiate with other arguments
+            return new paper.Path(...args);
         }
     }
 }
@@ -42,11 +42,11 @@ export class Path {
 export class Circle {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Path.Circle(); // Instantiate with no arguments
+            return new paper.Path.Circle();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Path.Circle(args[0]); // Instantiate with a single object parameter
+            return new paper.Path.Circle(args[0]);
         } else {
-            return new paper.Path.Circle(...args); // Instantiate with other arguments
+            return new paper.Path.Circle(...args);
         }
     }
 }
@@ -54,11 +54,11 @@ export class Circle {
 export class Ellipse {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Path.Ellipse(); // Instantiate with no arguments
+            return new paper.Path.Ellipse();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Path.Ellipse(args[0]); // Instantiate with a single object parameter
+            return new paper.Path.Ellipse(args[0]);
         } else {
-            return new paper.Path.Ellipse(...args); // Instantiate with other arguments
+            return new paper.Path.Ellipse(...args);
         }
     }
 }
@@ -66,11 +66,11 @@ export class Ellipse {
 export class Group {
     constructor(...args: any[]) {
         if (args.length === 0) {
-            return new paper.Group(); // Instantiate with no arguments
+            return new paper.Group();
         } else if (args.length === 1 && typeof args[0] === 'object') {
-            return new paper.Group(args[0]); // Instantiate with a single object parameter
+            return new paper.Group(args[0]);
         } else {
-            return new paper.Group(...args); // Instantiate with other arguments
+            return new paper.Group(...args);
         }
     }
 }

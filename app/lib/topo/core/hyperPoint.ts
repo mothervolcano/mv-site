@@ -9,9 +9,9 @@ import { Point, Segment, Path, Group } from '../drawing/paperjs';
 
 class HyperPoint {
 
-	private _point: IPoint;
-	private _handleIn: IPoint;
-	private _handleOut: IPoint;
+	private _point: Point;
+	private _handleIn: Point;
+	private _handleOut: Point;
 
 	private _position: number;
 	private _spin: number;
