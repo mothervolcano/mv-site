@@ -39,6 +39,12 @@
     align-self: start;
 }
 
+.logoIcon {
+    width: 24px;
+    height: 24px;
+    border: 1px solid black;
+}
+
 .intro {
 
     padding: 20px;
