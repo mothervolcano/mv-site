@@ -46,7 +46,6 @@ export default function Home() {
   };
 
   const updateStage = (mousePos: { x: number; y: number }) => {
-    init();
     update(mousePos);
     generate();
   };
