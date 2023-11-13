@@ -3,89 +3,51 @@ declare const paper: any;
 import Orbital from "./attractors/orbital";
 import OrbitalField from "./attractors/orbitalField";
 import HyperPoint from "../lib/topo/core/hyperPoint";
-import { Circle, Point } from "../lib/topo/drawing/paperjs";
+import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
 import { convertToSegment } from "../lib/topo/utils/converters";
+
+import Pen from "../lib/topo/tools/pen";
+import { normalize } from "../lib/topo/utils/helpers";
+import Spine from "./attractors/spine";
+import { pull } from "../lib/topo/tools/stitcher";
 
 const DEBUG_GREEN = "#10FF0C";
 const GUIDES = "#06E7EF";
 
-let view: any;
-let layer: any;
-let origin: any;
 
-function testOrbitalFieldWithOrbitals(pos: any, params?: any) {
-  const {
-    radius = 100,
-    count = 5,
-    p4 = 0,
-    p5 = 0,
-    p6 = 0,
-    p7 = 0,
-    p8 = 0,
-  } = params;
+// ------------------------------------------------------------------------
+// COMPONENTS
 
-  const position = new HyperPoint(pos);
-  const size = radius;
-  const orbitalRadius = radius / 2;
 
-  const orbitalField = new OrbitalField(position, size);
+interface PlotType {
+  position: { x: number, y: number };
+  radius: number;
+}
 
-  const orbitals = [];
+class Plot {
 
-  for (let i = 0; i < count; i++) {
-    orbitals.push(new Orbital(orbitalRadius));
-  }
+  position: {x: number, y: number};
+  radius: number;
 
-  orbitalField.addAttractors(orbitals);
-
-  // ---------------------
-
-  orbitalField.revolve(p5);
-
-  orbitalField.expandBy(p6 * radius, "RAY");
-  orbitalField.expandBy(p7 * radius, "HOR");
-
-  // ---------------------
-
-  // orbitalField.addAttractor(  new Orbital( orbitalRadius/2 ), p8 );
-
-  // ---------------------
-
-  const path = new paper.Path({
-    strokeColor: DEBUG_GREEN,
-    closed: true,
-  });
-
-  // --------------------
-
-  const pts = orbitalField.locate(1);
-
-  for (let i = 0; i < count; i++) {
-    pts[i].steer(p4);
-
-    const pt = convertToSegment(pts[i]);
-
-    path.add(pt);
+  constructor(position: {x: number, y: number}) {
+    this.position = position;
+    this.radius = radius;
   }
 }
 
-const radius = 50;
 
-interface dotType {
-  x: number;
-  y: number;
-  r: number;
-}
+// ----------------------------------------------------------------------
+// TOOLS
 
-const dot = {
-  x: 0,
-  y: 0,
-  r: radius,
-};
 
-let grid: dotType[] = [];
+const pen = Pen.getInstance();
 
-function createGrid(width: number, height: number, dot: any) {
+
+// ----------------------------------------------------------------------
+// CREATORS
+
+
+function createGrid(width: number, height: number) {
   const w = width / (radius*3);
   const h = height / (radius*3);
 
@@ -105,66 +67,180 @@ function createGrid(width: number, height: number, dot: any) {
     
     for (let r = 0; r < h; r++) {
       y = iy + r * (radius + m);
-      posList.push({ ...dot, x, y });
+
+      const plot: PlotType = new Plot({x,y})
+      posList.push(plot);
     }
   }
 
   return posList;
 }
 
-function concept_A(pos: any, dist: any) {
-  const position = new HyperPoint(pos);
-  const size = 100 + dist.x;
-  const orbitalRadius = size / 2;
 
-  const orbitalField = new OrbitalField(position, size);
+function ___createForma(pos: any, radius: number, opacity: number) {
 
-  const orbitals = [];
+  if ( opacity > 0 ) {
 
-  const count = 5;
+    const position = new HyperPoint(pos);
+    const size = radius;
+    const orbitalRadius = size / 3;
 
-  for (let i = 0; i < count; i++) {
-    orbitals.push(new Orbital(orbitalRadius));
+    const orbitalField = new OrbitalField(position, size);
+
+    const atts = [];
+
+    const count = 5;
+
+    for (let i = 0; i < count; i++) {
+      atts.push(new Orbital(orbitalRadius));
+    }
+
+    orbitalField.addAttractors(atts);
+
+    // ....................................................................
+
+    const pts = orbitalField.locate(0).map( (pt:any, i: number) => {
+      if ( pt.spin === -1 ) {
+        pt.flip();
+      }
+      return pt;
+    });
+
+    const path = new Path({fillColor: 'black', strokeWidth:2, closed: true})
+
+    pen.setPath(path);
+    pen.add(pts)
+
+    path.opacity = opacity;
+
+
   }
 
-  orbitalField.addAttractors(orbitals);
-  orbitalField.expandBy(dist.y, "RAY");
 
-  // ---------------------
-
-  const path = new paper.Path({
-    strokeColor: DEBUG_GREEN,
-    closed: true,
-  });
-
-  // --------------------
-
-  const pts = orbitalField.locate(1);
-
-  for (let i = 0; i < count; i++) {
-    const pt = convertToSegment(pts[i]);
-
-    path.add(pt);
-  }
 }
 
-function createOrbital(pos: any, radius: number) {
-  const position = new HyperPoint(pos);
-  const size = radius;
-  const orbitalRadius = size / 3;
+function createForma(position: {x: number, y: number}, opacity: number, params: any) {
+    const {
+      sideCtrl=5,
+      expansionCtrl=1,
+      twirlCtrl=1,
+      tipRoundnessCtrl=0,
+      joinRoundessCtrl=0,
+      extendCtrl=0,
+      shrinkCtrl=0,
+    } = params;
 
-  const orbitalField = new OrbitalField(position, size);
+    const sides = sideCtrl;
 
-  const orbitals = [];
+    const polyRadius = radius;
+    const starRadius = polyRadius * Math.cos(Math.PI / sides);
 
-  const count = 3;
+    const polyField = new OrbitalField(new HyperPoint(position), polyRadius);
+    const starField = new OrbitalField(new HyperPoint(position), starRadius);
 
-  for (let i = 0; i < count; i++) {
-    orbitals.push(new Orbital(orbitalRadius));
+    const num = sideCtrl;
+    const polySpineLength = radius;
+    const starSpineLength = radius;
+
+    // ----------------------------------------------
+    //
+
+    const polySpines: any[] = [];
+
+    for (let i = 0; i < num; i++) {
+      polySpines.push(new Spine(polySpineLength));
+    }
+
+    polyField.addAttractors(polySpines);
+
+    // ----------------------------------------------
+    //
+
+    const starSpines: any[] = [];
+
+    for (let i = 0; i < num; i++) {
+      starSpines.push(new Spine(starSpineLength));
+    }
+
+    starField.addAttractors(starSpines);
+
+    // ----------------------------------------------
+    // TWIRL ACTION
+
+    const angleOffset = (180 / num) * twirlCtrl;
+    starField.revolve(normalize(angleOffset, 0, 360));
+
+    // ----------------------------------------------
+    // PULL <> PUSH ACTION
+
+    starField.expandBy(starRadius * (expansionCtrl - 0.5) * 1.75, "RAY");
+
+    // ----------------------------------------------
+    // TWEAK LENGTH ACTION
+
+    polyField.expandBy(polyRadius * extendCtrl, "RAY");
+
+    
+    // ----------------------------------------------
+    // 
+
+
+    // ----------------------------------------------
+    // DRAW
+
+    const polyPts = polyField.locate(0.5);
+    const starPts = starField.locate(0.5);
+
+
+    // ----------------------------------------------
+    // TIP CURVATURE ACTION
+
+    const tipCurvature = radius/2 * tipRoundnessCtrl;
+
+    console.log('Tip curvature: ', tipCurvature)
+
+    for ( const pt of polyPts ) {
+
+      pull(pt, tipCurvature);
+      pt.steer(90);
+    }
+
+    // ----------------------------------------------
+    // JOIN CURVATURE ACTION  
+
+    const joinCurvature = radius/2 * joinRoundessCtrl;
+
+    for ( const pt of starPts ) {
+
+      pull(pt, joinCurvature);
+      pt.steer(90);
+    }
+
+    const path = new Path({
+      fillColor: 'black',
+      opacity: opacity,
+      closed: true,
+    });
+
+    for (let i = 0; i < num; i++) {
+      // retract(polyPts[i]);
+      path.add(convertToSegment(polyPts[i]));
+
+      // retract(starPts[i]);
+      // starPts[i].steer(90).scaleHandles( curveCtrl );
+      path.add(convertToSegment(starPts[i]));
+    }
+
+    // ----------------------------------------------
+    //
+
+    // this._path.rotate( 90, this._position.point );
   }
 
-  orbitalField.addAttractors(orbitals);
-}
+
+// ----------------------------------------------------------------------
+// HELPERS
+
 
 function proximityEffect(origin: any, position: any) {
 
@@ -174,13 +250,27 @@ function proximityEffect(origin: any, position: any) {
   const d = o.getDistance(p)
   console.log('distance: ', d)
 
-  if (d<radius*2) {
-    return radius * d/radius;
+  if (d<radius*6) {
+    return radius * d/radius / 6;
   } else {
     return radius;
   }
 
 }
+
+
+
+// ----------------------------------------------------------------------
+
+let view: any;
+let layer: any;
+let origin: any;
+
+const radius = 25;
+
+let grid: PlotType[] = [];
+
+
 
 export function init() {
   paper.project.clear();
@@ -188,7 +278,7 @@ export function init() {
   origin = view.center;
   layer = new paper.Layer();
 
-  grid = createGrid(view.size.width, view.size.height, dot);
+  grid = createGrid(view.size.width, view.size.height);
 }
 
 export function update(position: { x: number; y: number }) {
@@ -201,15 +291,17 @@ export function update(position: { x: number; y: number }) {
 }
 
 export function generate() {
-  // const path = new Circle({ center: paper.view.center, radius: 50, fillColor: 'black'});
-
-  // testOrbitalFieldWithOrbitals(origin, { p5: 0.15, p6: 0.25});
-
-  // concept_A(origin, view.center.subtract(origin));
-
   grid.forEach((n) => {
     // console.log("grid", n);
-    const r = proximityEffect({x: n.x, y: n.y}, origin)
-    createOrbital({ x: n.x, y: n.y }, r);
+    const r = proximityEffect(n.position, origin)
+    const opacity = 1 - normalize(r, 0, radius)
+    if ( opacity > 0 ) {
+
+      const params = {
+        expansionCtrl: normalize(r, 0, radius)
+      }
+
+      createForma(n.position, opacity, params);
+    }
   });
 }
