@@ -1,4 +1,5 @@
-import { Point } from 'paper';
+// import { Point } from 'paper';
+import { Point } from '../drawing/paperjs';
 
 import HyperPoint from '../core/hyperPoint';
 
@@ -26,6 +27,12 @@ export function merge( hpt1: any, hpt2: any ) {
 	hpt.polarity = hpt1.polarity;
 
 	return hpt;
+}
+
+export function pull( hpt: any, length: number ) {
+
+	hpt.handleIn.length = length;
+	hpt.handleOut.length = length;
 }
 
 export function breakOut( hpt: any, angle: number ) {
