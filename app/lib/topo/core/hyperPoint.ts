@@ -278,10 +278,10 @@ class HyperPoint {
 
 		this._point = this._point.add( v.multiply(d) );
 		
-		/* DEBUG */  debugPath.add( this._point );
-		/* DEBUG */  const debugDot = new DebugDot( this._point, '#FFAE29', 2) // orange
+		// /* DEBUG */  debugPath.add( this._point );
+		// /* DEBUG */  const debugDot = new DebugDot( this._point, '#FFAE29', 2) // orange
 
-		this._debugGuides.addChildren( [ debugPath, debugDot ] )
+		// this._debugGuides.addChildren( [ debugPath, debugDot ] )
 
 		return this;
 	}
@@ -301,12 +301,12 @@ class HyperPoint {
 
 		/* DEBUG */
 
-		const _debugPath1 = new Path({segments: [this._point, this._point.add(this._handleOut.multiply(1))], strokeColor: '#02B7FD'})
-		const _debugPath2 = new Path({segments: [this._point, this._point.add(this._handleIn.multiply(1))], strokeColor: '#02B7FD'})
-		const _debugDot1 = new DebugDot(this._point.add(this._handleOut.multiply(1)), '#FFAE29', 2) // orange
-		const _debugDot2 = new DebugDot(this._point.add(this._handleIn.multiply(1)), '#FFE44F', 2) // yellow
+		// const _debugPath1 = new Path({segments: [this._point, this._point.add(this._handleOut.multiply(1))], strokeColor: '#02B7FD'})
+		// const _debugPath2 = new Path({segments: [this._point, this._point.add(this._handleIn.multiply(1))], strokeColor: '#02B7FD'})
+		// const _debugDot1 = new DebugDot(this._point.add(this._handleOut.multiply(1)), '#FFAE29', 2) // orange
+		// const _debugDot2 = new DebugDot(this._point.add(this._handleIn.multiply(1)), '#FFE44F', 2) // yellow
 
-		this._debugGuides.addChildren( [ _debugPath1, _debugPath2, _debugDot1, _debugDot2 ] );
+		// this._debugGuides.addChildren( [ _debugPath1, _debugPath2, _debugDot1, _debugDot2 ] );
 
 		/* */
 

@@ -1,4 +1,5 @@
-import { Path } from 'paper';
+// import { Path } from 'paper';
+import { Path } from "../drawing/paperjs";
 
 const DEBUG_GREEN = '#10FF0C';
 const RED_MARK = '#CE2D4F';
