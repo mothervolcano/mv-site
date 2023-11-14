@@ -10,24 +10,10 @@ import useMousePosition from "../hooks/useMousePosition";
 const PaperStage = ({ onPaperLoad, onMouseClick, onMouseMove }: any) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [mousePos, setMousePos] = useMousePosition();
-
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		const handleMouseMove = (event: MouseEvent) => {
-			setMousePos({ x: event.clientX, y: event.clientY } as MouseEvent);
-			onMouseMove(mousePos)
-		};
-
-		if (canvas) {
-			canvas.addEventListener("mousemove", handleMouseMove);
-		}
-
-		return () => {
-			if (canvas) {
-				canvas.removeEventListener("mousemove", handleMouseMove);
-			}
-		};
-	}, [setMousePos]);
+	
+	if (canvasRef.current) {
+		onMouseMove(mousePos);
+	}
 
 	return (
 		<>

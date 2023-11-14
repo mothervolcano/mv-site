@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import styles from "./page.module.css";
-import { camptonBook, camptonBold } from "./styles/fonts";
 
 import PaperStage from "./components/paperStage";
 import ProjectCard from "./components/ProjectCard";
@@ -11,9 +10,10 @@ import Logo from "./components/logo";
 import { Button, Title } from '@mantine/core';
 
 import { init, update, generate } from "./demo/main";
+import { useState } from "react";
 
-export default function Home() {
-  const projectList = [
+
+const projectList = [
     {
       title: "Polka Folks",
       descrition: "...",
@@ -35,6 +35,8 @@ export default function Home() {
     },
   ];
 
+export default function Home() {
+
   // ---------------------------------------------
   // HANDLERS
 
@@ -46,8 +48,9 @@ export default function Home() {
   };
 
   const updateStage = (mousePos: { x: number; y: number }) => {
-    update(mousePos);
-    generate();
+
+      update(mousePos);
+      generate();
   };
 
   return (
