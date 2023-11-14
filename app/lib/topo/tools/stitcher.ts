@@ -52,6 +52,12 @@ export function iron( hpt1: any, hpt2: any ) {
 
 }
 
+export function retract( hpt: any ) {
+
+	hpt.handleIn.length = 0;
+	hpt.handleOut.length = 0;
+}
+
 export function ortoAlign( hpt: any, along: string ) {
 
 	if ( along === 'HOR' ) {
