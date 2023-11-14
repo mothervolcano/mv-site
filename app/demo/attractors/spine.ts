@@ -114,12 +114,12 @@ class Spine extends AttractorObject {
 
 			segments: [ this._A.getSegment(), this._B.getSegment() ],
 			// segments: [ this._A.point.add(this._position), this._B.point.add(this._position) ],
-			strokeColor: '#02B7FD'
+			// strokeColor: '#02B7FD'
 		});
 
 		// this._path.fullySelected = true;
 
-		this.addOrientationArrow()
+		// this.addOrientationArrow()
 		
 		super.render( new Group( [ this._path, this._arrow ] ))
 	}

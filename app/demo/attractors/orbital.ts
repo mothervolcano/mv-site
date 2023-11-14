@@ -75,13 +75,16 @@ class Orbital extends AttractorObject {
 
 			center: this.position,
 			radius: this.size,
-			strokeColor: '#00A5E0'
+			// strokeColor: '#00A5E0'
 		})
 
-		/* DEBUG */
-		this.addOrientationArrow();
+		this._path.visible = false;
 
-		super.render( new Group( [ this._path, this._arrow ] ) );
+		/* DEBUG */
+		// this.addOrientationArrow();
+
+		// super.render( new Group( [ this._path, this._arrow ] ) );
+		super.render(this._path)
 
 	};
 

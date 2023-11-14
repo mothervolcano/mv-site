@@ -7,15 +7,20 @@ const useMousePosition = (): MousePositionHook => {
 	
 	const [ position, setPosition ] = useState<MousePosition>({x:0, y:0});
 
+	// const handleMouseMove = ( event: MouseEvent ): void => {
+
+	// 	if ( event.target ) {
+
+	// 		let rect: DOMRect = (event.target as HTMLElement).getBoundingClientRect();
+
+	// 		setPosition({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+	// 	}
+	// };
+
 	const handleMouseMove = ( event: MouseEvent ): void => {
 
-		if ( event.target ) {
-
-			let rect: DOMRect = (event.target as HTMLElement).getBoundingClientRect();
-
-			setPosition({ x: event.clientX - rect.left, y: event.clientY - rect.top });
-		}
-	};
+		setPosition({x: event.clientX, y: event.clientY} as MousePosition)
+	}
 
 	useEffect( () => {
 
@@ -25,7 +30,7 @@ const useMousePosition = (): MousePositionHook => {
 
 	}, []);
 
-	return [ position, handleMouseMove ];
+	return [ position, setPosition ];
 
 }
 

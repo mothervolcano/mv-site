@@ -1,4 +1,5 @@
-import { Point } from 'paper';
+// import { Point } from 'paper';
+import { Point } from '../drawing/paperjs';
 
 import HyperPoint from '../core/hyperPoint';
 
@@ -28,6 +29,12 @@ export function merge( hpt1: any, hpt2: any ) {
 	return hpt;
 }
 
+export function pull( hpt: any, length: number ) {
+
+	hpt.handleIn.length = length;
+	hpt.handleOut.length = length;
+}
+
 export function breakOut( hpt: any, angle: number ) {
 
 	hpt.handleOut.angle += angle;
@@ -43,6 +50,12 @@ export function iron( hpt1: any, hpt2: any ) {
 	hpt1.handleOut = null;
 	hpt2.handleIn = null;
 
+}
+
+export function retract( hpt: any ) {
+
+	hpt.handleIn.length = 0;
+	hpt.handleOut.length = 0;
 }
 
 export function ortoAlign( hpt: any, along: string ) {

@@ -29,7 +29,8 @@ class OrbitalField extends AttractorField {
 		this._attractor.orientation = 1;
 		this._attractor.polarity = 1;
 
-		this._attractor.getPath().strokeColor = '#FFE44F';
+		/* DEBUG */
+		// this._attractor.getPath().strokeColor = '#FFE44F';
 
 		this.arrangeAttractors( this.filterAttractors() );
 
