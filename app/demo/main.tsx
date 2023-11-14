@@ -105,7 +105,7 @@ let view: any;
 let layer: any;
 let origin: any;
 
-const radius = 20;
+const radius = 30;
 
 let grid: PlotType[] = [];
 
@@ -149,6 +149,7 @@ export function generate() {
       if ( n.visible ) {
         n.visible = false;
       }
+      // const placeHolder = new Circle({center: n.position, radius: 5, fillColor: '#DEE2E6'})
     }
 
     
