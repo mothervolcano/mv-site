@@ -1,4 +1,4 @@
-import { OrientationType, PolarityType, IAttractor, IAttractorObject, IHyperPoint, VectorDirection, PointLike, SizeLike } from '../types';
+import { OrientationType, PolarityType, IAttractor, IAttractorObject, IHyperPoint, VectorDirection, PointLike, SizeLike, IAttractorField } from '../types';
 
 import DisplayNode from './displayNode';
 import AttractorObject from './attractorObject';
@@ -8,7 +8,7 @@ import HyperPoint from './hyperPoint';
 abstract class AttractorField extends DisplayNode {
 
 
-	protected _attractor: IAttractor & IAttractorObject | undefined;
+	protected _attractor: IAttractor | undefined;
 
 	private _span: Array<number>;
 	private _shift: number;
@@ -150,7 +150,7 @@ abstract class AttractorField extends DisplayNode {
 	};
 
 
-	public getAttractor( i?: number ) {
+	public getAttractor( i?: number ): any {
 
 		if ( typeof i === 'number' ) {
 
@@ -158,12 +158,12 @@ abstract class AttractorField extends DisplayNode {
 
 		} else {
 
-			return this._attractor;
+			return this._attractor!;
 		}
 	};
 
 
-	public locate( at: number, orient: boolean = false ): any {
+	public locate( at: number, orient: boolean = false ): IHyperPoint[] {
 
 		const attractors = this.filterAttractors();
 		const anchors = attractors
@@ -336,7 +336,7 @@ abstract class AttractorField extends DisplayNode {
 
 		for ( const att of this.filterAttractors() ) {
 
-			att.rotate( angle * att.orientation );
+			att.rotate( angle );
 		}
 
 		return this;

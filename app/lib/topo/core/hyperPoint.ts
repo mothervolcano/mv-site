@@ -2,16 +2,14 @@ import { BooleanLike, VectorDirection, IPoint, PointLike, SizeLike } from '../ty
 
 import { validatePointInput } from '../utils/converters'
 
-import DebugDot from '../utils/debugDot'
-
-import { Point, Segment, Path, Group } from '../drawing/paperjs';
+import { Point, Segment, Path, Circle} from '../drawing/paperjs'
 
 
 class HyperPoint {
 
-	private _point: Point;
-	private _handleIn: Point;
-	private _handleOut: Point;
+	private _point: IPoint;
+	private _handleIn: IPoint;
+	private _handleOut: IPoint;
 
 	private _position: number;
 	private _spin: number;
@@ -53,7 +51,7 @@ class HyperPoint {
 		this._position = 0;
 
 		/* DEBUG */
-		this._debugGuides = new Group();
+		this._debugGuides = [];
 
 		// this._debugPath1 = new Path()
 		// this._debugPath2 = new Path()
@@ -234,7 +232,7 @@ class HyperPoint {
 		
 		if (scaleIn) {
 
-		    if (scale >= 0 && scale <= 1) {
+		    if (scale >= 0 && scale <= 1 && this._handleIn) {
 
 		      this._handleIn.length *= scale;
 
@@ -247,7 +245,7 @@ class HyperPoint {
 
 		if (scaleOut) {
 
-		    if (scale >= 0 && scale <= 1) {
+		    if (scale >= 0 && scale <= 1 && this._handleOut) {
 
 		      this._handleOut.length *= scale;
 
@@ -279,7 +277,7 @@ class HyperPoint {
 		this._point = this._point.add( v.multiply(d) );
 		
 		// /* DEBUG */  debugPath.add( this._point );
-		// /* DEBUG */  const debugDot = new DebugDot( this._point, '#FFAE29', 2) // orange
+		// /* DEBUG */  const debugDot = new Circle( this._point, 2) // orange
 
 		// this._debugGuides.addChildren( [ debugPath, debugDot ] )
 
@@ -295,6 +293,11 @@ class HyperPoint {
 		this._handleOut = new Point({ angle: axis + aperture/2 * this._spin, length: this._handleOut.length * hScale });
 		this._handleIn = new Point({ angle: axis - aperture/2 * this._spin, length: this._handleIn.length * hScale });
 
+		this.tangent = this._handleOut;
+		this.normal = this.tangent.rotate(-90, this.tangent.point);
+		this.tangent.normalize();
+		this.normal.normalize();
+
 		// this._handleOut.angle += ( tilt )
 		// this._handleIn.angle += ( tilt )
 
@@ -303,8 +306,8 @@ class HyperPoint {
 
 		// const _debugPath1 = new Path({segments: [this._point, this._point.add(this._handleOut.multiply(1))], strokeColor: '#02B7FD'})
 		// const _debugPath2 = new Path({segments: [this._point, this._point.add(this._handleIn.multiply(1))], strokeColor: '#02B7FD'})
-		// const _debugDot1 = new DebugDot(this._point.add(this._handleOut.multiply(1)), '#FFAE29', 2) // orange
-		// const _debugDot2 = new DebugDot(this._point.add(this._handleIn.multiply(1)), '#FFE44F', 2) // yellow
+		// const _debugDot1 = new Circle(this._point.add(this._handleOut.multiply(1)), 2) // orange
+		// const _debugDot2 = new Circle(this._point.add(this._handleIn.multiply(1)), 2) // yellow
 
 		// this._debugGuides.addChildren( [ _debugPath1, _debugPath2, _debugDot1, _debugDot2 ] );
 
@@ -342,7 +345,7 @@ class HyperPoint {
 
 	public clearGuides(): void {
 
-		this._debugGuides.removeChildren();
+		// this._debugGuides.removeChildren();
 	}
 
 }

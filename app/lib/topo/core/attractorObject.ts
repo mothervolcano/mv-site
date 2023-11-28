@@ -222,8 +222,8 @@ abstract class AttractorObject extends DisplayObject {
 		extractedPath.splitAt( extractedPath.getNearestLocation( P1 ) )
 		let discardedPath = extractedPath.splitAt( extractedPath.getNearestLocation( P2 ) )
 
-		extractedPath.strokeColor = 'red';
-		extractedPath.strokeWidth = 5;
+		// extractedPath.strokeColor = 'red';
+		// extractedPath.strokeWidth = 5;
 
 		discardedPath.remove();
 
@@ -334,7 +334,7 @@ abstract class AttractorObject extends DisplayObject {
 		return this;
 	};
 
-	public skew( vector: IPoint ): any {
+	public skew( vector: PointLike ): any {
 
 		// this._path.scale( hor, ver )
 		this._content.shear( vector, this._path.position );
@@ -347,7 +347,7 @@ abstract class AttractorObject extends DisplayObject {
 
 		if ( !this.isAxisLocked ) {
 
-			this._content.rotate( angle, this._anchor.point );
+			this._content.rotate( angle * this._orientation, this._anchor.point );
 			this.axisAngle += angle;
 		}
 	};
