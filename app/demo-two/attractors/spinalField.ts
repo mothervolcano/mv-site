@@ -14,6 +14,8 @@ class SpinalField extends AttractorField {
 
 	private _length: number;
 	private _mode: string;
+
+	#alternator: boolean = false;
 	
 	
 	constructor( positionData: IHyperPoint | [ IHyperPoint, IHyperPoint ], length: number | null, mode: string = 'SYMMETRICAL' ) {
@@ -31,6 +33,10 @@ class SpinalField extends AttractorField {
 
 		return this;
 	};
+
+	private alternate() {
+		this.#alternator = !this.#alternator;
+	}
 
 
 	protected render() {
@@ -73,7 +79,7 @@ class SpinalField extends AttractorField {
 		this._attractor.adjustToPolarity( anchor );
 	};
 
-
+	// Called by the base class AttractorField
 	protected configureAttractor( att: IAttractor, anchor: IHyperPoint ) {
 
 		switch ( this._mode ) {
@@ -99,18 +105,22 @@ class SpinalField extends AttractorField {
 
 		case 'ALTERNATED': // TODO: need to know the order of each att
 
+			this.alternate();
+
+			console.log('ALTERNATING? ', this.#alternator)
+
 			att.adjustRotationToPosition( 
 
 	        	anchor,
-	        	(pos:number) => { return isEven(pos) },
-	        	(pos:number) => { return isOdd(pos) },
+	        	(pos:number) => { return !this.#alternator },
+	        	(pos:number) => { return this.#alternator },
 
 	        );
 
 			att.adjustToOrientation( 
 	            anchor,
-	            (pos:number) => { return isEven(pos)  }, // the condition of this field for the orientation to be 1
-	            (pos:number) => { return isOdd(pos) }, // the condition of this field for the orientation to be -1
+	            (pos:number) => { return this.#alternator }, // the condition of this field for the orientation to be 1
+	            (pos:number) => { return !this.#alternator }, // the condition of this field for the orientation to be -1
 			);
 
 			break;
