@@ -2,7 +2,7 @@ declare const paper: any;
 
 import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
 
-import { createSineWave } from "./waves";
+import { createSineWave, createFlatLine } from "./waves";
 
 // ------------------------------------------------------------------------
 // MODULE GLOBALS
@@ -54,7 +54,7 @@ function proximitySensor(position: { x: number; y: number }, origin: any, radius
 function calculateAmplitude(position: { x: number; y: number }, origin: any, radius: number) {
 	const d = origin.y - position.y;
 
-	return radius - Math.abs(d);
+	return (radius - Math.abs(d))*0.50;
 }
 
 function createGrid(width: number, height: number): PlotType[] {
@@ -100,7 +100,7 @@ export function generate() {
 	// if ( proximitySensor(plot.position, origin, 100) ) {
 	// 	createSineWave(plot.position, plot.length, 10);
 	// }
-	const effectRadius = 100;
+	const effectRadius = 200;
 	const freq = 10;
 	const x = origin.x / view.size.width;
 	const ix = Math.floor(freq * x);
@@ -111,7 +111,8 @@ export function generate() {
 			createSineWave(n.position, n.length, freq, amp, ix);
 			console.log("...generating wave: ", amp);
 		} else {
-			createSineWave(n.position, n.length, 3);
+			// createSineWave(n.position, n.length, freq, 1, ix);
+			createFlatLine(n.position, n.length)
 		}
 	});
 }
@@ -128,6 +129,6 @@ export function _generate() {
 		const amp = calculateAmplitude(plot.position, origin, effectRadius);
 
 		createSineWave(plot.position, plot.length, freq, amp, ix);
-		console.log("...generating wave: ", amp);
+		// console.log("...generating wave: ", amp);
 	}
 }
