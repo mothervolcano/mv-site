@@ -42,7 +42,7 @@ export function createSineWave(
 	const baseline = new SpinalField(new HyperPoint(position), length, "ALTERNATED");
 
 	const cycle = baseline.length / freq;
-	const handleLength = ((cycle / 4) * 5) / 3;
+	const handleLength = mode === MODES.SINE ? ((cycle / 4) * 5) / 3 : 0;
 
 	const path = new Path({
 		strokeColor: 'black',
