@@ -19,21 +19,16 @@ const MODES: any = {
 
 const mode = MODES.SINE;
 
-function envelope(i: number, axis: number) {}
+function envelopeAmp(i: number, nx: number, freq: number) {
 
-export function createFlatLine(position: { x: number; y: number },
-	length: number) {
+	const ix = i/(freq-1)
 
-	const line = new Spine(length, new HyperPoint(position));
+	const d = 0.50-Math.abs(nx - ix);
 
-	const A = line.locate(0)
-	const B = line.locate(1);
+	console.log(`enveloping step ${i}`, Math.sin(d))
 
-	const path = new Path({
-		segments: [A.getSegment(), B.getSegment()],
-		strokeColor: DEBUG_GREEN,
-		strokeWidth: 2
-	})
+	return Math.sin(d);
+
 }
 
 export function createSineWave(
@@ -41,7 +36,7 @@ export function createSineWave(
 	length: number,
 	freq: number,
 	amp: number,
-	axis: number,
+	nx: number,
 ): SpinalField {
 	// ...
 	const baseline = new SpinalField(new HyperPoint(position), length, "ALTERNATED");
@@ -50,19 +45,31 @@ export function createSineWave(
 	const handleLength = ((cycle / 4) * 5) / 3;
 
 	const path = new Path({
-		strokeColor: DEBUG_GREEN,
-		strokeWidth: 2,
+		strokeColor: 'black',
+		strokeWidth: 1,
 	});
 
 	const spines = [];
 
 	for (let i = 0; i < freq; i++) {
+
+		const ampFactor = envelopeAmp(i, nx, freq);
 		// const len = i === axis ? length/12 : length/25;
-		const spine = new Spine(amp);
+		const spine = new Spine(Math.max(amp*ampFactor, 1));
 		spines.push(spine);
 	}
 
 	baseline.addAttractors(spines);
+
+	// const compression = 0.20 * nx;
+	
+	// if ( nx > 0.5 ) {
+	// 	baseline.compress(0 + 0.20*nx, 1);
+	// } else {
+	// 	baseline.compress(0, 1 - 0.20*nx);
+	// }
+
+	// baseline.compress(0.10, 0.90);
 
 	// ------------------------------------------------
 
@@ -71,6 +78,11 @@ export function createSineWave(
 
 	let currPt = null;
 	let prevPt = null;
+
+	// const A = baseline.attractor.locate(0).scaleHandles(0)
+	// const B = baseline.attractor.locate(1).scaleHandles(0)
+
+	// path.add(A.getSegment());
 
 	for (let i = 0; i < hpts1.length; i++) {
 		currPt = hpts1[i];
@@ -97,10 +109,32 @@ export function createSineWave(
 		// markPoint( hpt.point );
 		// traceSegment( hpt.getSegment() );
 
-		path.add(currPt.getSegment());
+		if (currPt.point.x !== 0 && currPt.point.y !== 0) {
+			path.add(currPt.getSegment());
+		}
+
 
 		prevPt = currPt;
 	}
 
+	// path.add(B.getSegment());
+
+	// path.fullySelected = true;
+
 	return baseline;
+}
+
+export function createFlatLine(position: { x: number; y: number },
+	length: number) {
+
+	const line = new Spine(length, new HyperPoint(position));
+
+	const A = line.locate(0)
+	const B = line.locate(1);
+
+	const path = new Path({
+		segments: [A.getSegment(), B.getSegment()],
+		strokeColor: 'black',
+		strokeWidth: 1
+	})
 }

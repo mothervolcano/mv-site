@@ -11,7 +11,7 @@ let view: any;
 let layer: any;
 let origin: any;
 
-const rowNum = 15;
+const rowNum = 30;
 
 let grid: PlotType[] = [];
 
@@ -54,7 +54,7 @@ function proximitySensor(position: { x: number; y: number }, origin: any, radius
 function calculateAmplitude(position: { x: number; y: number }, origin: any, radius: number) {
 	const d = origin.y - position.y;
 
-	return (radius - Math.abs(d))*0.50;
+	return (radius - Math.abs(d))*0.30;
 }
 
 function createGrid(width: number, height: number): PlotType[] {
@@ -101,14 +101,14 @@ export function generate() {
 	// 	createSineWave(plot.position, plot.length, 10);
 	// }
 	const effectRadius = 200;
-	const freq = 10;
-	const x = origin.x / view.size.width;
-	const ix = Math.floor(freq * x);
+	const freq = 25;
+	const nx = origin.x / view.size.width;
+	// const ix = Math.floor(freq * x);
 
 	grid.forEach((n) => {
 		if (proximitySensor(n.position, origin, effectRadius)) {
 			const amp = calculateAmplitude(n.position, origin, effectRadius);
-			createSineWave(n.position, n.length, freq, amp, ix);
+			createSineWave(n.position, n.length, freq, amp, nx);
 			console.log("...generating wave: ", amp);
 		} else {
 			// createSineWave(n.position, n.length, freq, 1, ix);
@@ -118,17 +118,16 @@ export function generate() {
 }
 
 export function _generate() {
-	const effectRadius = 100;
-	const freq = 10;
-	const x = origin.x / view.size.width;
-	const ix = Math.floor(freq * x);
+	const effectRadius = 200;
+	const freq = 25;
+	const nx = origin.x / view.size.width;
+	// const ix = Math.floor(freq * x);
 
 	const plot = grid[3];
 
 	if (proximitySensor(plot.position, origin, effectRadius)) {
 		const amp = calculateAmplitude(plot.position, origin, effectRadius);
-
-		createSineWave(plot.position, plot.length, freq, amp, ix);
+		createSineWave(plot.position, plot.length, freq, amp, nx);
 		// console.log("...generating wave: ", amp);
 	}
 }

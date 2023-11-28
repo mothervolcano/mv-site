@@ -1,28 +1,35 @@
-import { OrientationType, PolarityType, PathLocationData, IHyperPoint, PointLike, SizeLike, IAttractor } from '../../lib/topo/types';
+import {
+	OrientationType,
+	PolarityType,
+	PathLocationData,
+	IHyperPoint,
+	PointLike,
+	SizeLike,
+	IAttractor,
+} from "../../lib/topo/types";
 
-import AttractorField from '../../lib/topo/core/attractorField';
-import Spine from './spine';
-import Orbital from './orbital';
+import AttractorField from "../../lib/topo/core/attractorField";
+import Spine from "./spine";
+import Orbital from "./orbital";
 
-import { isEven, isOdd } from '../../lib/topo/utils/helpers';
-
-
+import { isEven, isOdd } from "../../lib/topo/utils/helpers";
 
 class SpinalField extends AttractorField {
-
 	private _positionData: any;
 
 	private _length: number;
 	private _mode: string;
 
 	#alternator: boolean = false;
-	
-	
-	constructor( positionData: IHyperPoint | [ IHyperPoint, IHyperPoint ], length: number | null, mode: string = 'SYMMETRICAL' ) {
 
-		const _path = Spine.project( positionData, length )
+	constructor(
+		positionData: IHyperPoint | [IHyperPoint, IHyperPoint],
+		length: number | null,
+		mode: string = "SYMMETRICAL",
+	) {
+		const _path = Spine.project(positionData, length);
 
-		super( _path.getPointAt( _path.length/2 ), _path.bounds.size )
+		super(_path.getPointAt(_path.length / 2), _path.bounds.size);
 
 		this._positionData = positionData;
 
@@ -32,126 +39,129 @@ class SpinalField extends AttractorField {
 		this.render();
 
 		return this;
-	};
+	}
 
 	private alternate() {
 		this.#alternator = !this.#alternator;
 	}
 
-
 	protected render() {
-
-		if ( this.isRendered ) {
-
+		if (this.isRendered) {
 			this._content.remove();
 			this.isRendered = false;
 		}
 
-		this._attractor = new Spine( this._length, this._positionData );
+		this._attractor = new Spine(this._length, this._positionData);
 		this._attractor.orientation = this.orientation;
 		this._attractor.polarity = this.polarity;
 
-		this.arrangeAttractors( this.filterAttractors() );
+		this.arrangeAttractors(this.filterAttractors());
 
 		// super.render( this._attractor._content );
-		super.render( this._attractor.path );
-
-	};
-
-	public adjustRotationToPosition( anchor: IHyperPoint, isPositive: Function, isNegative: Function  ) {
-
-		if ( !this._attractor ) { throw new Error('Orbital Field has no defined base attractor') };
-
-		this._attractor.adjustRotationToPosition( anchor, isPositive, isNegative );
-	};
-
-	public adjustToOrientation( anchor: IHyperPoint, isPositive: Function, isNegative: Function ) {
-
-		if ( !this._attractor ) { throw new Error('Orbital Field has no defined base attractor') };
-
-		this._attractor.adjustToOrientation( anchor, isPositive, isNegative );
-	};
-
-	public adjustToPolarity( anchor: IHyperPoint ) {
-
-		if ( !this._attractor ) { throw new Error('Orbital Field has no defined base attractor') };
-
-		this._attractor.adjustToPolarity( anchor );
-	};
-
-	// Called by the base class AttractorField
-	protected configureAttractor( att: IAttractor, anchor: IHyperPoint ) {
-
-		switch ( this._mode ) {
-
-
-		case 'SYMMETRICAL':
-
-			att.adjustRotationToPosition( 
-
-	        	anchor,
-	        	(pos:number) => { return pos < 0.5  },
-	        	(pos:number) => { return pos >= 0.5 },
-
-	        );
-
-			att.adjustToOrientation( 
-	            anchor,
-	            (pos:number) => { return pos < 0.5  }, // the condition of this field for the orientation to be 1
-	            (pos:number) => { return pos >= 0.5 }, // the condition of this field for the orientation to be -1
-			);
-
-			break;
-
-		case 'ALTERNATED': // TODO: need to know the order of each att
-
-			this.alternate();
-
-			console.log('ALTERNATING? ', this.#alternator)
-
-			att.adjustRotationToPosition( 
-
-	        	anchor,
-	        	(pos:number) => { return !this.#alternator },
-	        	(pos:number) => { return this.#alternator },
-
-	        );
-
-			att.adjustToOrientation( 
-	            anchor,
-	            (pos:number) => { return this.#alternator }, // the condition of this field for the orientation to be 1
-	            (pos:number) => { return !this.#alternator }, // the condition of this field for the orientation to be -1
-			);
-
-			break;
-
-
-		case 'DIRECTED':
-
-			att.adjustRotationToPosition( 
-
-	        	anchor,
-	        	(pos:number) => { return pos >= 0 },
-	        	(pos:number) => { return false },
-
-	        );
-
-			att.adjustToOrientation( 
-	            anchor,
-	            (pos:number) => { return pos >= 0  }, // the condition of this field for the orientation to be 1
-	            (pos:number) => { return false }, // the condition of this field for the orientation to be -1
-			);
-
-			break;
-
-		}
-		
-		
-		
-		att.adjustToPolarity( anchor );
-
+		super.render(this._attractor.path);
 	}
 
+	public adjustRotationToPosition(anchor: IHyperPoint, isPositive: Function, isNegative: Function) {
+		if (!this._attractor) {
+			throw new Error("Orbital Field has no defined base attractor");
+		}
+
+		this._attractor.adjustRotationToPosition(anchor, isPositive, isNegative);
+	}
+
+	public adjustToOrientation(anchor: IHyperPoint, isPositive: Function, isNegative: Function) {
+		if (!this._attractor) {
+			throw new Error("Orbital Field has no defined base attractor");
+		}
+
+		this._attractor.adjustToOrientation(anchor, isPositive, isNegative);
+	}
+
+	public adjustToPolarity(anchor: IHyperPoint) {
+		if (!this._attractor) {
+			throw new Error("Orbital Field has no defined base attractor");
+		}
+
+		this._attractor.adjustToPolarity(anchor);
+	}
+
+	// Called by the base class AttractorField
+	protected configureAttractor(att: IAttractor, anchor: IHyperPoint) {
+		switch (this._mode) {
+			case "SYMMETRICAL":
+				att.adjustRotationToPosition(
+					anchor,
+					(pos: number) => {
+						return pos < 0.5;
+					},
+					(pos: number) => {
+						return pos >= 0.5;
+					},
+				);
+
+				att.adjustToOrientation(
+					anchor,
+					(pos: number) => {
+						return pos < 0.5;
+					}, // the condition of this field for the orientation to be 1
+					(pos: number) => {
+						return pos >= 0.5;
+					}, // the condition of this field for the orientation to be -1
+				);
+
+				break;
+
+			case "ALTERNATED": // TODO: need to know the order of each att
+				this.alternate();
+
+				att.adjustRotationToPosition(
+					anchor,
+					(pos: number) => {
+						return !this.#alternator;
+					},
+					(pos: number) => {
+						return this.#alternator;
+					},
+				);
+
+				att.adjustToOrientation(
+					anchor,
+					(pos: number) => {
+						return this.#alternator;
+					}, // the condition of this field for the orientation to be 1
+					(pos: number) => {
+						return !this.#alternator;
+					}, // the condition of this field for the orientation to be -1
+				);
+
+				break;
+
+			case "DIRECTED":
+				att.adjustRotationToPosition(
+					anchor,
+					(pos: number) => {
+						return pos >= 0;
+					},
+					(pos: number) => {
+						return false;
+					},
+				);
+
+				att.adjustToOrientation(
+					anchor,
+					(pos: number) => {
+						return pos >= 0;
+					}, // the condition of this field for the orientation to be 1
+					(pos: number) => {
+						return false;
+					}, // the condition of this field for the orientation to be -1
+				);
+
+				break;
+		}
+
+		att.adjustToPolarity(anchor);
+	}
 
 	// protected calculateRotation( i: number, anchor: any ) {
 
@@ -165,26 +175,17 @@ class SpinalField extends AttractorField {
 	// 	}
 	// };
 
-
-	set mode( value: string ) {
-
+	set mode(value: string) {
 		this._mode = value;
-	};
+	}
 
 	get mode() {
-
 		return this._mode;
-	};
+	}
 
 	get length() {
-
 		return this._length;
-	};
-
+	}
 }
 
-
-export default SpinalField
-
-
-
+export default SpinalField;
