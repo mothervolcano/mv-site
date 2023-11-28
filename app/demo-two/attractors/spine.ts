@@ -1,4 +1,4 @@
-import { Point, Path, Group } from '../../lib/topo/drawing/paperjs';
+import { Point, Path, Group, Circle } from '../../lib/topo/drawing/paperjs';
 
 import { PathLocationData, UnitIntervalNumber, IHyperPoint, PointLike, SizeLike } from '../../lib/topo/types';
 import { validatePointInput, convertToSegment, convertToPoint } from '../../lib/topo/utils/converters';
@@ -10,6 +10,7 @@ import HyperPoint from '../../lib/topo/core/hyperPoint';
 
 class Spine extends AttractorObject {
 
+	private DEBUG_MODE: boolean = false;
 
 	private _A: any
 	private _B: any
@@ -114,14 +115,19 @@ class Spine extends AttractorObject {
 
 			segments: [ this._A.getSegment(), this._B.getSegment() ],
 			// segments: [ this._A.point.add(this._position), this._B.point.add(this._position) ],
-			strokeColor: '#02B7FD'
+			visible: false
 		});
 
-		this._path.visible = true;
+		if ( this.DEBUG_MODE ) {
+
+			this._path.strokeColor = '#02B7FD'
+			this._path.visible = true;
+			this.addOrientationArrow()
+		}
+
 
 		// this._path.fullySelected = true;
 
-		// this.addOrientationArrow()
 		
 		super.render( new Group( [ this._path, this._arrow ] ))
 	}
@@ -135,7 +141,7 @@ class Spine extends AttractorObject {
 
 		} else  if ( isNegative( anchor.position ) ) {
 
-			this.axisAngle = 0;
+			this.axisAngle = 180;
 
 		} else {
 
@@ -207,7 +213,7 @@ class Spine extends AttractorObject {
 		                            segments: [ this._debugPath1.lastSegment.point, _Br ],
 		                            strokeColor: '#70D9FF' })
 
-		this._debugPath4 = new Path.Circle({center: midPoint, radius: 2, fillColor: '#70D9FF'})
+		this._debugPath4 = new Circle({center: midPoint, radius: 2, fillColor: '#70D9FF'})
 	
 
 		this._arrow.addChild(this._debugPath1)
