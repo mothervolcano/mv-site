@@ -49,20 +49,21 @@ export default function Home() {
   // ...
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [paperLoaded, setPaperLoaded] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
   const { width, height } = useViewportSize();
 
   // ---------------------------------------------
   // HOOKS
 
-  useEffect(() => {
-    if (paperLoaded) {
-      console.log(`! resize paper view to: width: ${width} height: ${height}`);
-      paper.project.view.viewSize = [width / 3, height];
+  // useEffect(() => {
+  //   if (paperLoaded) {
+  //     console.log(`! resize paper view to: width: ${width} height: ${height}`);
+  //     paper.project.view.viewSize = [width / 3, height];
 
-      init();
-      generate();
-    }
-  }, [width, height]);
+  //     init();
+  //     generate();
+  //   }
+  // }, [width, height]);
 
   // ---------------------------------------------
   // HANDLERS
@@ -73,25 +74,36 @@ export default function Home() {
     init();
     generate();
 
-    setPaperLoaded(true);
+    if ( !paperLoaded ) {
+      setPaperLoaded(true);
+      setInitialized(true);
+    }
   };
 
   const updateStage = (mousePos: { x: number; y: number }) => {
     // console.log(`! update stage: x: ${mousePos.x} y: ${mousePos.y}`);
-    update(mousePos);
-    generate();
+    if (paperLoaded && initialized) {
+      update(mousePos);
+      generate();
+    }
   };
 
-  const coverAreaWidth = `${(width * 1) / 3}px`;
-  const projectsAreaWidth = `${(width * 2) / 3}px`;
+  const resizeStage = (width: number, height: number) => {
+    if (paperLoaded && initialized) {
+      console.log('resize stage: ', width, height);
+      paper.project.view.viewSize = [width, height];
+      init();
+      generate();
+    }
+  }
 
   return (
     <>
-      {width ? (
+      {true ? (
         <div className={styles.container}>
-          <div style={{ width: coverAreaWidth, height: "100%" }} className={styles.cover}>
+          <div className={styles.cover}>
             <div className={styles.stage}>
-              <PaperStage canvasRef={canvasRef} width={(width * 1) / 3} height={height} onMouseMove={updateStage} />
+              <PaperStage canvasRef={canvasRef} width={(width * 1) / 3} height={height} onMouseMove={updateStage} onResize={resizeStage}/>
             </div>
             <Script
               src="../lib/paper/paper-core.js"
@@ -116,7 +128,7 @@ export default function Home() {
             </Flex>
           </div>
 
-          <div style={{ width: projectsAreaWidth, height: "100%" }} className={styles.projects}>
+          <div className={styles.projects}>
             <ProjectCard
               title={"Polka Folks"}
               contrast="LIGHT"
