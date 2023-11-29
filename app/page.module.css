@@ -2,19 +2,19 @@
 .container {
     width: 100%;
     height: 100vh;
-/*    margin: 20px;*/
+    border-top: 1px black solid;
+    border-left: 1px black solid;
+    border-bottom: 1px black solid;
     background-color: #ffffff;
-    border: 1px black solid;
     display: grid;
-    grid-template-areas: 
-        "cover projects";
-    grid-template-columns: 3fr 4fr;
+    grid-template-columns: 3fr 5fr;
+    grid-template-areas: "cover projects";
     gap: 0px;
 }
 
 /* Cover styling */
 .cover {
-    background-color: #ECECEC;
+    background-color: #ececec;
     border-right: 1px black solid;
     position: relative;
     grid-area: cover;
@@ -25,12 +25,11 @@
 }
 
 .stage {
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .logo {
@@ -48,11 +47,11 @@
 .intro {
 }
 
-.logo, .intro {
+.logo,
+.intro {
     position: relative;
     z-index: 100;
 }
-
 
 /* Project cards and grid */
 .projects {
@@ -73,15 +72,28 @@
     aspect-ratio: 1; /* This keeps the card as a square */
     display: flex;
     align-items: center;
-    justify-content: center; /* These flex properties center the text inside each project card */
+    justify-content: center; /* Center the text inside each project card */
 }
 
-@media (max-width: 800px) {
+@media (orientation: portrait) or (max-width: 1440px) {
     .container {
-        grid-template-areas: 
+        grid-template-areas:
             "cover"
             "projects";
         grid-template-columns: 1fr; /* This makes it single column layout on smaller screens */
+    }
+    .projects {
+        border-top: 1px solid black;
+    }
+}
+
+@media (min-width: 1440px) {
+    .container {
+    }
+}
+
+@media (max-width: 1080px) {
+    .container {
     }
 }
 
