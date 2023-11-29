@@ -2,43 +2,41 @@
 
 declare const paper: any;
 
-import { useRef, useEffect, useState } from "react";
-import Script from "next/script";
+import styles from "../page.module.css";
 
+import { useRef, useEffect, useState } from "react";
+
+// import { useViewportSize } from "@mantine/hooks";
 import useMousePosition from "../hooks/useMousePosition";
 
-const PaperStage = ({ onPaperLoad, onMouseClick, onMouseMove }: any) => {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
+// const onViewportChange = (width: number, height: number) => {
+// 	console.log(`! viewport changed: width: ${width} height: ${height}`);
+// };
+
+const PaperStage = ({ canvasRef, width, height, onMouseMove}: any) => {
+	// ...
 	const [mousePos, setMousePos] = useMousePosition();
-	
+	// const { width, height } = useViewportSize();
+
 	if (canvasRef.current) {
 		onMouseMove(mousePos);
 	}
 
+	// console.log("MOUNTING PAPERSTAGE!");
+
+	// const canvasWidth = width ? `${width}px` : "100%";
+
+	// onViewportChange(width, height);
+
 	return (
-		<>
-			<canvas
-				style={{ position: "relative", width: "100%", height: "100%" }}
-				ref={canvasRef}
-				onClick={(e) => {
-					setMousePos(e as unknown as MouseEvent);
-					onMouseClick(mousePos);
-				}}
-			></canvas>
-
-			<Script
-				src="../../lib/paper/paper-core.js"
-				onReady={() => {
-					console.log(`Paperjs is ready! --> ${paper}`);
-
-					paper.install(window);
-					paper.setup(canvasRef.current);
-					onPaperLoad(true);
-
-					// const path = new paper.Path.Circle({ center: paper.view.center, radius: 50, fillColor: 'black'})
-				}}
-			/>
-		</>
+		<canvas
+			style={{ backgroundColor: "green", position: "relative", width: `${width}px`, height: `${height}px` }}
+			ref={canvasRef}
+			// onClick={(e) => {
+			// 	setMousePos(e as unknown as MouseEvent);
+			// 	onMouseClick(mousePos);
+			// }}
+		></canvas>
 	);
 };
 

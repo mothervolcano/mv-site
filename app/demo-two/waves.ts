@@ -20,15 +20,13 @@ const MODES: any = {
 const mode = MODES.SINE;
 
 function envelopeAmp(i: number, nx: number, freq: number) {
+	const ix = i / (freq - 1);
 
-	const ix = i/(freq-1)
+	const d = 0.5 - Math.abs(nx - ix);
 
-	const d = 0.50-Math.abs(nx - ix);
-
-	console.log(`enveloping step ${i}`, Math.sin(d))
+	// console.log(`enveloping step ${i}`, Math.sin(d))
 
 	return Math.sin(d);
-
 }
 
 export function createSineWave(
@@ -45,24 +43,23 @@ export function createSineWave(
 	const handleLength = mode === MODES.SINE ? ((cycle / 4) * 5) / 3 : 0;
 
 	const path = new Path({
-		strokeColor: 'black',
+		strokeColor: "black",
 		strokeWidth: 1,
 	});
 
 	const spines = [];
 
 	for (let i = 0; i < freq; i++) {
-
 		const ampFactor = envelopeAmp(i, nx, freq);
 		// const len = i === axis ? length/12 : length/25;
-		const spine = new Spine(Math.max(amp*ampFactor, 1));
+		const spine = new Spine(Math.max(amp * ampFactor, 1));
 		spines.push(spine);
 	}
 
 	baseline.addAttractors(spines);
 
 	// const compression = 0.20 * nx;
-	
+
 	// if ( nx > 0.5 ) {
 	// 	baseline.compress(0 + 0.20*nx, 1);
 	// } else {
@@ -113,7 +110,6 @@ export function createSineWave(
 			path.add(currPt.getSegment());
 		}
 
-
 		prevPt = currPt;
 	}
 
@@ -124,17 +120,15 @@ export function createSineWave(
 	return baseline;
 }
 
-export function createFlatLine(position: { x: number; y: number },
-	length: number) {
-
+export function createFlatLine(position: { x: number; y: number }, length: number) {
 	const line = new Spine(length, new HyperPoint(position));
 
-	const A = line.locate(0)
+	const A = line.locate(0);
 	const B = line.locate(1);
 
 	const path = new Path({
 		segments: [A.getSegment(), B.getSegment()],
-		strokeColor: 'black',
-		strokeWidth: 1
-	})
+		strokeColor: "black",
+		strokeWidth: 1,
+	});
 }

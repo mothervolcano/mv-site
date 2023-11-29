@@ -80,8 +80,11 @@ export function init() {
 	view = paper.project.view;
 	origin = view.center;
 	layer = new paper.Layer();
-
 	grid = createGrid(view.size.width, view.size.height);
+	view.onResize = () => {
+		console.log('!!! Paper view resized!')
+		layer.position = view.center;
+	}
 }
 
 export function update(position: { x: number; y: number }) {
@@ -109,7 +112,6 @@ export function generate() {
 		if (proximitySensor(n.position, origin, effectRadius)) {
 			const amp = calculateAmplitude(n.position, origin, effectRadius);
 			createSineWave(n.position, n.length, freq, amp, nx);
-			console.log("...generating wave: ", amp);
 		} else {
 			// createSineWave(n.position, n.length, freq, 1, ix);
 			createFlatLine(n.position, n.length)
