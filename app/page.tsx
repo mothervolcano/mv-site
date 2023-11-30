@@ -23,25 +23,41 @@ import thumbPolystar from "../public/img/project_thumb_polystar.png";
 
 import { init, update, generate } from "./demo-two/main";
 
-const projectList = [
+const projectsData = [
   {
     title: "Polka Folks",
-    descrition: "...",
+    description: `One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.`,
+    image: thumbPolkaFolks,
+    constrat: "LIGHT"
   },
 
   {
     title: "Arborator",
-    descrition: "...",
+    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
+    image: thumbArborator,
+    contrast: "DARK"
   },
 
   {
-    title: "FASS",
-    descrition: "...",
+    title: "Hilbert",
+    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
+    image: thumbFass,
+    contrast: "DARK"
+
+  },
+
+  {
+    title: "Polystar",
+    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    image: thumbPolystar,
+    contrast: "LIGHT"
   },
 
   {
     title: "Oscill",
-    descrition: "...",
+    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    image: thumbFassPlugin,
+    contrast: "LIGHT"
   },
 ];
 
@@ -90,7 +106,7 @@ export default function Home() {
 
   const resizeStage = (width: number, height: number) => {
     if (paperLoaded && initialized) {
-      console.log('resize stage: ', width, height);
+      // console.log('resize stage: ', width, height);
       paper.project.view.viewSize = [width, height];
       init();
       generate();
@@ -129,36 +145,12 @@ export default function Home() {
           </div>
 
           <div className={styles.projects}>
-            <ProjectCard
-              title={"Polka Folks"}
-              contrast="LIGHT"
-              image={thumbPolkaFolks}
-              description={`One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.`}
-            />
-            <ProjectCard
-              title={"FASS"}
-              contrast="DARK"
-              image={thumbFass}
-              description={`"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`}
-            />
-            <ProjectCard
-              title={"Arborator"}
-              contrast="LIGHT"
-              image={thumbArborator}
-              description={`The bedding was hardly able to cover it and seemed ready to slide off any moment. His many legs, pitifully thin compared with the size of the rest of him, waved about helplessly as he looked. "What's happened to me? " `}
-            />
-            <ProjectCard
-              title={"Polystar"}
-              contrast="LIGHT"
-              image={thumbPolystar}
-              description={`It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`}
-            />
-            <ProjectCard
-              title={"FASS Plugin"}
-              contrast="LIGHT"
-              image={thumbFassPlugin}
-              description={`You've got to get enough sleep. Other travelling salesmen live a life of luxury. For instance, whenever I go back to the guest house during the morning to copy out the contract, these gentlemen are always still sitting there eating their breakfasts. `}
-            />
+            {projectsData.map( p => <ProjectCard
+              title={p.title}
+              contrast={p.contrast}
+              image={p.image}
+              description={p.description}
+            />)}
           </div>
         </div>
       ) : (

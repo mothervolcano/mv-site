@@ -83,14 +83,6 @@ export default function ProjectCard(props: any) {
 							<Text style={bodyTypo} size="sm" lh="xs" p={10}>
 								{description}
 							</Text>
-							<Button
-								ml={10}
-								variant="transparent"
-								size="compact-xs"
-								leftSection={<IconEye stroke={1.5} />}
-							>
-								See on GitHub
-							</Button>
 						</Container>
 					</Flex>
 				</Flex>
