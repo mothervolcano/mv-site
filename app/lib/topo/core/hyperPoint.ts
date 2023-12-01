@@ -194,28 +194,6 @@ class HyperPoint {
 		return this.AXIS.RAY;
 	}
 
-	
-
-	public getSegment( withInHandle: BooleanLike = true, withOutHandle: BooleanLike = true ): any {
-	  
-		const includeInHandle = Boolean(withInHandle);
-		const includeOutHandle = Boolean(withOutHandle);		
-		
-		let hIn;
-		let hOut;
-
-		 if (includeInHandle ) {
-		   hIn = this._handleIn;
-		 }
-
-		if (includeOutHandle ) {
-		  hOut = this._handleOut;
-		}
-
-		return new Segment(this._point, hIn, hOut);
-	}
-
-
 	public flip(): HyperPoint {
 
 	    // const temp = this._handleIn;
@@ -226,39 +204,6 @@ class HyperPoint {
 
 	    return this;
   	}
-
-
-	public scaleHandles( scale: number, scaleIn: BooleanLike = true, scaleOut: BooleanLike = true ) {
-		
-		if (scaleIn) {
-
-		    if (scale >= 0 && scale <= 1 && this._handleIn) {
-
-		      this._handleIn.length *= scale;
-
-		    } else if (scale > 1) {
-
-		      // this._handleIn.length = scale;
-		      this._handleIn.length *= scale;
-		    }
-		}
-
-		if (scaleOut) {
-
-		    if (scale >= 0 && scale <= 1 && this._handleOut) {
-
-		      this._handleOut.length *= scale;
-
-		    } else if (scale > 1) {
-
-		      // this._handleOut.length = scale;
-		      this._handleOut.length *= scale;
-		    }
-		}
-
-  		return this;
-	}
-
 
 	public offsetBy( by: number, along: VectorDirection ): HyperPoint {
 
@@ -283,8 +228,6 @@ class HyperPoint {
 
 		return this;
 	}
-
-	
 
 	public steer( tilt: number, aperture: number = 180, hScale: number = 1 ): HyperPoint {
 
