@@ -1,7 +1,5 @@
 declare const paper: any;
 
-// import { Color } from 'paper';
-
 import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
 import { IPath } from "../lib/topo/types";
 import { degToRad } from "../lib/topo/utils/helpers";
@@ -16,6 +14,7 @@ let layer: any;
 let origin: any;
 
 const rowNum = 30;
+const step = degToRad(90/rowNum);
 
 let grid: PlotType[] = [];
 
@@ -67,11 +66,9 @@ function calculateAmplitude(position: { x: number; y: number }, origin: any, rad
 function createGrid(width: number, height: number): PlotType[] {
 	// ...
 	const mt = height * 0.09;
-	const mb = height * 0.15;
+	const mb = height * 0.06;
 	const h = (height - mt) / rowNum;
 	const x = width / 2;
-
-	const step = degToRad(90/rowNum);  
 
 	const plots: PlotType[] = [];
 
@@ -129,8 +126,6 @@ export function generate() {
 	const nx = origin.x / view.size.width;
 	// const ix = Math.floor(freq * x);
 
-	const step = degToRad(90/rowNum);
-
 	const flatLine: IPath = createFlatLine({x:0, y: 0}, view.size.width);
 
 	grid.forEach((n, i) => {
@@ -140,7 +135,7 @@ export function generate() {
 
 		const freq = 2 + Math.min(Math.floor(baseFreq*Math.tan(step*i)));
 
-		if (proximitySensor(n.position, origin, effectRadius)) {
+		if (proximitySensor(n.position, origin, effectRadius) && i < rowNum-3) {
 			const amp = calculateAmplitude(n.position, origin, effectRadius);
 			createSineWave(n.position, n.length, freq, amp*Math.cos(step*i)*1.25, nx, freq/baseFreq);
 		} else {

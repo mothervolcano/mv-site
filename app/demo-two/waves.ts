@@ -140,7 +140,7 @@ export function createFlatLine(position: { x: number; y: number }, length: numbe
 	const B = line.locate(1);
 
 	const path = new Path({
-		segments: [A.getSegment(), B.getSegment()],
+		segments: [convertToSegment(A), convertToSegment(B)],
 		strokeColor: lineColor,
 		strokeWidth: 1,
 	});
