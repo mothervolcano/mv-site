@@ -1,8 +1,12 @@
 declare const paper: any;
 
-import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
+// import { Color } from 'paper';
 
-import { createSineWave, createFlatLine } from "./waves";
+import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
+import { IPath } from "../lib/topo/types";
+import { degToRad } from "../lib/topo/utils/helpers";
+
+import { setStyle, createSineWave, createFlatLine } from "./waves";
 
 // ------------------------------------------------------------------------
 // MODULE GLOBALS
@@ -22,17 +26,20 @@ interface PlotType {
 	position: { x: number; y: number };
 	length: number;
 	visible: boolean;
+	color: paper.Color;
 }
 
 class Plot {
 	position: { x: number; y: number };
 	length: number;
 	visible: boolean;
+	color: paper.Color;
 
 	constructor(position: { x: number; y: number }, length: number) {
 		this.position = position;
 		this.length = length;
 		this.visible = false;
+		this.color = new paper.Color(0, 0, 0);
 	}
 }
 
@@ -59,13 +66,17 @@ function calculateAmplitude(position: { x: number; y: number }, origin: any, rad
 
 function createGrid(width: number, height: number): PlotType[] {
 	// ...
-	const h = height / rowNum;
+	const mt = height * 0.09;
+	const mb = height * 0.15;
+	const h = (height - mt) / rowNum;
 	const x = width / 2;
+
+	const step = degToRad(90/rowNum);  
 
 	const plots: PlotType[] = [];
 
 	for (let row = 0; row < rowNum; row++) {
-		const y = h * row;
+		const y =  mt + (height-mb) * (1 - Math.sin(step*row));
 
 		const plot: PlotType = new Plot({ x, y }, width);
 		plots.push(plot);
@@ -85,6 +96,16 @@ export function init() {
 		console.log('!!! Paper view resized!')
 		layer.position = view.center;
 	}
+	// view.onFrame = () => {
+	// 	layer.rotate(1);
+	// }
+	// view.emit("resize")
+}
+
+export function resize(width: number, height: number) {
+
+	view.viewSize = [width, height];
+	layer.position = view.center;
 }
 
 export function update(position: { x: number; y: number }) {
@@ -104,17 +125,29 @@ export function generate() {
 	// 	createSineWave(plot.position, plot.length, 10);
 	// }
 	const effectRadius = 200;
-	const freq = 25;
+	const baseFreq = 25;
 	const nx = origin.x / view.size.width;
 	// const ix = Math.floor(freq * x);
 
-	grid.forEach((n) => {
+	const step = degToRad(90/rowNum);
+
+	const flatLine: IPath = createFlatLine({x:0, y: 0}, view.size.width);
+
+	grid.forEach((n, i) => {
+		const color = new paper.Color(n.color);
+		color.alpha = 1-Math.max(i, rowNum/2)/rowNum;
+		setStyle({color});
+
+		const freq = 2 + Math.min(Math.floor(baseFreq*Math.tan(step*i)));
+
 		if (proximitySensor(n.position, origin, effectRadius)) {
 			const amp = calculateAmplitude(n.position, origin, effectRadius);
-			createSineWave(n.position, n.length, freq, amp, nx);
+			createSineWave(n.position, n.length, freq, amp*Math.cos(step*i)*1.25, nx, freq/baseFreq);
 		} else {
 			// createSineWave(n.position, n.length, freq, 1, ix);
-			createFlatLine(n.position, n.length)
+			flatLine.clone()
+			flatLine.position = n.position;
+			flatLine.strokeColor = color;
 		}
 	});
 }
@@ -125,11 +158,14 @@ export function _generate() {
 	const nx = origin.x / view.size.width;
 	// const ix = Math.floor(freq * x);
 
-	const plot = grid[3];
+	const plot = grid[10];
+
+	const color = new paper.Color(plot.color);
+	setStyle({color});
 
 	if (proximitySensor(plot.position, origin, effectRadius)) {
 		const amp = calculateAmplitude(plot.position, origin, effectRadius);
-		createSineWave(plot.position, plot.length, freq, amp, nx);
+		createSineWave(plot.position, plot.length, freq, amp, nx, 1);
 		// console.log("...generating wave: ", amp);
 	}
 }
