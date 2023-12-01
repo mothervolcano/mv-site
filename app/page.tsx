@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 
 // import Image from "next/image";
 import styles from "./page.module.css";
-import { useViewportSize } from "@mantine/hooks";
 
 import PaperStage from "./components/paperStage";
 import ProjectCard from "./components/ProjectCard";
@@ -21,7 +20,7 @@ import thumbFassPlugin from "../public/img/project_thumb_fass_plugin.png";
 import thumbArborator from "../public/img/project_thumb_arborator.png";
 import thumbPolystar from "../public/img/project_thumb_polystar.png";
 
-import { init, update, generate } from "./demo-two/main";
+import { init, resize, update, generate } from "./demo-two/main";
 
 const projectsData = [
   {
@@ -66,20 +65,20 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [paperLoaded, setPaperLoaded] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
-  const { width, height } = useViewportSize();
+  const [canvasSize, setCanvasSize] = useState<{width: number; height: number} | null>(null);
+  // const { width, height } = useViewportSize();
 
   // ---------------------------------------------
   // HOOKS
 
-  // useEffect(() => {
-  //   if (paperLoaded) {
-  //     console.log(`! resize paper view to: width: ${width} height: ${height}`);
-  //     paper.project.view.viewSize = [width / 3, height];
-
-  //     init();
-  //     generate();
-  //   }
-  // }, [width, height]);
+  useEffect(() => {
+    if (paperLoaded && canvasSize) {
+      console.log(`! resize paper view to: width: ${canvasSize.width} height: ${canvasSize.height}`);
+      // resize(canvasSize.width, canvasSize.height);
+      init();
+      generate();
+    }
+  }, []);
 
   // ---------------------------------------------
   // HANDLERS
@@ -99,19 +98,20 @@ export default function Home() {
   const updateStage = (mousePos: { x: number; y: number }) => {
     // console.log(`! update stage: x: ${mousePos.x} y: ${mousePos.y}`);
     if (paperLoaded && initialized) {
+      // if (canvasSize) { resize(canvasSize.width, canvasSize.height) };
       update(mousePos);
       generate();
     }
   };
 
-  const resizeStage = (width: number, height: number) => {
-    if (paperLoaded && initialized) {
-      // console.log('resize stage: ', width, height);
-      paper.project.view.viewSize = [width, height];
-      init();
-      generate();
-    }
-  }
+  // const resizeStage = (size: {width:number, height: number}) => {
+  //   if (paperLoaded && initialized) {
+  //     console.log('resize stage: ', size.width, size.height);
+  //     resize(size.width, size.height);
+  //     init();
+  //     generate();
+  //   }
+  // }
 
   return (
     <>
@@ -119,7 +119,7 @@ export default function Home() {
         <div className={styles.container}>
           <div className={styles.cover}>
             <div className={styles.stage}>
-              <PaperStage canvasRef={canvasRef} width={(width * 1) / 3} height={height} onMouseMove={updateStage} onResize={resizeStage}/>
+              <PaperStage canvasRef={canvasRef} onMouseMove={updateStage} onResize={setCanvasSize}/>
             </div>
             <Script
               src="../lib/paper/paper-core.js"
