@@ -55,7 +55,7 @@ export default function ProjectCard(props: any) {
 				borderBottom: "1px solid black",
 			}}
 		>
-			<AspectRatio ratio={1 / 1}>
+			<AspectRatio ratio={1 / 1.10}>
 				<Image
 					alt="Polka Folks project thumbnail image"
 					src={image}
