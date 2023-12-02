@@ -5,9 +5,10 @@ import Spine from "./attractors/spine";
 import OrbitalField from "./attractors/orbitalField";
 import HyperPoint from "../lib/topo/core/hyperPoint";
 import SpinalField from "./attractors/spinalField";
-import { pull } from "../lib/topo/tools/stitcher";
+import { pull, retract, scaleHandles } from "../lib/topo/tools/stitcher";
 import { IPath } from "../lib/topo/types";
 import { convertToSegment } from "../lib/topo/utils/converters";
+import { degToRad } from "../lib/topo/utils/helpers";
 
 const DEBUG_GREEN = "#10FF0C";
 const GUIDES = "#06E7EF";
@@ -22,22 +23,18 @@ const MODES: any = {
 const mode = MODES.SINE;
 
 let lineColor: paper.Color;
+let lineWeight: number = 1;  
 
 
 function envelopeAmp(i: number, nx: number, freq: number, nf: number) {
-	const ix = i / (freq - 1);
-
-
-	const f = Math.max(0.5-nf*0.1, 0.2)
 	
-
+	const ix = i / (freq - 1);
+	const f = Math.max(0.5-nf*0.1, 0.2)
+	// const d = 0.5 - Math.abs(nx - ix);
 	const d = f - Math.abs(nx - ix);
-	// const d = 0.2 - Math.abs(nx - ix);
 
-	// console.log(`enveloping step ${i}`, Math.sin(d))
-	console.log('envelope', d)
-
-	return Math.max(Math.sin(d), 0);
+	// return Math.max(Math.sin(d), 0);
+	return Math.max(d, 0);
 }
 
 export function setStyle({ color }: { color: paper.Color }) {
@@ -49,58 +46,59 @@ export function createSineWave(
 	length: number,
 	frequency: number,
 	amplitude: number,
+	compression: number,
 	nx: number,
+	ny: number,
 	nf: number
 ) {
 	// ...
 	const baseline = new SpinalField(new HyperPoint(position), length, "ALTERNATED");
 
 	const amp = amplitude;
-	const freq = frequency;
+	const freq = Math.max(frequency, 2);
 
-	const cycle = baseline.length / freq;
-	const handleLength = mode === MODES.SINE ? (cycle / 4) * (5/3) : 0;
 
-	const path: IPath = new Path({
-		strokeColor: lineColor,
-		strokeWidth: 1,
-	});
+	const compressionAxis = nx;
+	const compressionRange = 1 * (1-compression);
+	// const compressionRange = 0.2 * (1-nf2);
+	const compressionStart = Math.max(nx-compressionRange/2, 0)
+	const compressionEnd = Math.min(nx+compressionRange/2, 1)
+	
+	const cycle = (baseline.length*(compressionRange)) / freq;
+	const handleLength = mode === MODES.SINE ? (cycle / 4) * (5/3): 0;
 
 	const spines = [];
-	const curveLengths = [];
 
 	for (let i = 0; i < freq; i++) {
 		const ampFactor = envelopeAmp(i, nx, freq, nf);
 		// console.log("ampFactor: ", ampFactor)
 		const spine = new Spine(Math.max(amp * ampFactor, 1));
 		spines.push(spine);
-		// curveLengths.push(handleLength*(ampFactor*5 - ampFactor*5));
 	}
 
 	baseline.addAttractors(spines);
 
-	// const compression = 0.20 * nx;
+	if ( compression > 0 ) {
+		baseline.compress(compressionStart, compressionEnd);
+	}
 
-	// if ( nx > 0.5 ) {
-	// 	baseline.compress(0 + 0.20*nx, 1);
-	// } else {
-	// 	baseline.compress(0, 1 - 0.20*nx);
-	// }
-
-	// baseline.compress(0.10, 0.90);
 
 	// ------------------------------------------------
+
+	const waveColor = new paper.Color(lineColor);
+	waveColor.red = 1;
+
+	const path: IPath = new Path({
+		strokeColor: waveColor,
+		// strokeWidth: lineWeight*(1-ny),
+		strokeWidth: lineWeight,
+	});
 
 	const hpts1 = baseline.locate(1);
 	const hpts0 = baseline.locate(0);
 
 	let currPt = null;
 	let prevPt = null;
-
-	// const A = baseline.attractor.locate(0).scaleHandles(0)
-	// const B = baseline.attractor.locate(1).scaleHandles(0)
-
-	// path.add(A.getSegment());
 
 	for (let i = 0; i < hpts1.length; i++) {
 		currPt = hpts1[i];
@@ -119,7 +117,7 @@ export function createSineWave(
 		}
 
 		if (mode === MODES.SQUARE) {
-			hpts0[i].scaleHandles(handleLength);
+			scaleHandles(hpts0[i], 0);
 			path.add(convertToSegment(hpts0[i]));
 		}
 
@@ -130,19 +128,36 @@ export function createSineWave(
 		prevPt = currPt;
 	}
 
+	// path.firstSegment.handleIn = null;
+	// path.firstSegment.handleOut = null;
+
+	// path.lastSegment.handleIn = null;
+	// path.lastSegment.handleOut = null;
+
+	if (compression > 0) {
+
+		const A = baseline.attractor.locate(0);
+		const B = baseline.attractor.locate(1)
+		retract(A)
+		retract(B)
+		path.insert(0,convertToSegment(A));
+		path.add(convertToSegment(B));
+	}
+
 	// path.fullySelected = true;
 }
 
-export function createFlatLine(position: { x: number; y: number }, length: number) {
+export function createFlatLine(position: { x: number; y: number }, length: number, ny: number): IPath {
 	const line = new Spine(length, new HyperPoint(position));
 
 	const A = line.locate(0);
 	const B = line.locate(1);
 
-	const path = new Path({
+	const path: IPath = new Path({
 		segments: [convertToSegment(A), convertToSegment(B)],
 		strokeColor: lineColor,
-		strokeWidth: 1,
+		// strokeWidth: lineWeight * (1-ny),
+		strokeWidth: lineWeight,
 	});
 
 	return path;
