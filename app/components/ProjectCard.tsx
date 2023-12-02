@@ -6,6 +6,7 @@ import {
 	camptonBold,
 } from "../styles/fonts";
 
+import Link from 'next/link';
 import Image from "next/image";
 
 import {
@@ -36,12 +37,12 @@ export default function ProjectCard(props: any) {
 				? "black"
 				: "black",
 		fontFamily: camptonMedium.style.fontFamily,
-		fontSize: rem(30),
-		marginLeft: rem(10),
-		marginTop: rem(5),
+		fontSize: "2rem",
+		marginLeft: "1rem",
+		marginTop: "0.70rem",
 	};
 
-	const bodyTypo = {
+	const bodyTypography = {
 		fontFamily: camptonBook.style.fontFamily,
 	};
 
@@ -71,6 +72,10 @@ export default function ProjectCard(props: any) {
 					</Title>
 					<Flex direction="column" align="flex-end" p={0}>
 						<ActionIcon
+							component={Link}
+							href={link}
+							target="_blank"
+							// onClick={(event) => {event.preventDefault(); console.log("open: ", event.currentTarget.href)}}
 							variant="filled"
 							size="xl"
 							color="black"
@@ -80,7 +85,7 @@ export default function ProjectCard(props: any) {
 						</ActionIcon>
 						<Container bg="white" p={0}>
 							<Divider size="xs" color="black" />
-							<Text style={bodyTypo} size="sm" lh="xs" p={10}>
+							<Text style={bodyTypography} size="0.90rem" lh="1.09rem" p={10}>
 								{description}
 							</Text>
 						</Container>
