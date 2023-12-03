@@ -1,333 +1,204 @@
-// import { Point } from 'paper';
 
-import { Point } from '../drawing/paperjs';
+import { IGroup, IPath, IPoint, PointLike, SizeLike } from "../types";
+import { validatePointInput, validateSizeInput } from "../utils/converters";
+import { Point } from "../drawing/paperjs";
 
-import { DisplayObjectType, IDisplayObject, PointLike, SizeLike } from '../types'
-
-import { validatePointInput, validateSizeInput } from '../utils/converters'
 
 /**
  * Abstract class representing a display frame.
- * @abstract
  */
 
 abstract class DisplayObject {
-
 	public isRendered: boolean;
 	public isRemoved: boolean;
-	protected _content: any;
-	protected _position: any; // decide what is the definitive type for position
-	private _size: any; // decide what is the definitive type for position
-	private _ratio: number; // drop this property
-	private pins: any;
-
+	protected _content: IPath | IGroup | null;
+	protected _position: IPoint;
+	private _size: SizeLike;
 
 	/**
-	* Validates the size input.
-	* @param {any} input - The size input to validate.
-	* @returns {any} The validated size input.
-	* @private
-	*/
-
-
-	/**
-	* Gets the X coordinate from a point.
-	* @param {any} point - The point to get the X coordinate from.
-	* @returns {number} The X coordinate.
-	* @private
-	*/
+	 * Gets the X coordinate from a point.
+	 */
 
 	private static getX(point: any): number {
-    // TODO: Implement logic...
+		// TODO: Implement logic...
 		return point[0];
 	}
 
-
 	/**
-	* Gets the Y coordinate from a point.
-	* @param {any} point - The point to get the Y coordinate from.
-	* @returns {number} The Y coordinate.
-	* @private
-	*/
+	 * Gets the Y coordinate from a point.
+	 */
 
 	private static getY(point: any): number {
-    // TODO: Implement logic...
+		// TODO: Implement logic...
 		return point[1];
 	}
 
-
 	/**
-	* Gets the width from a size.
-	* @param {any} size - The size to get the width from.
-	* @returns {number} The width.
-	* @private
-	*/
+	 * Gets the width from a size.
+	 */
 
 	private static getWidth(size: any): number {
 		// return this._content.bounds.width;
 		return size[0];
 	}
 
-
 	/**
-	* Gets the height from a size.
-	* @param {any} size - The size to get the height from.
-	* @returns {number} The height.
-	* @private
-	*/
+	 * Gets the height from a size.
+	 */
 
 	private static getHeight(size: any): number {
 		// return this._content.bounds.height;
 		return size[1];
 	}
 
-
 	/**
-	* Creates an instance of DisplayObject.
-	* @param {any} position - The initial position of the display frame.
-	* @param {any} size - The initial size of the display frame.
-	*/
+	 * Creates an instance of DisplayObject.
+	 */
 
-	constructor( position: PointLike, size: SizeLike ) {
-
-		this._position = validatePointInput( position );
-		this._size = validateSizeInput( size );
-		this._ratio = 0// null;
+	constructor(position: PointLike, size?: SizeLike) {
+		this._position = validatePointInput(position);
+		this._size = validateSizeInput(size);
+		
 		this._content = null;
 
 		this.isRendered = false;
 		this.isRemoved = false;
-
-		this.pins = {
-
-			CENTER: () => [this._content.bounds.center.x, this._content.bounds.center.y],
-			BC: () => [this._content.bounds.bottomCenter.x, this._content.bounds.bottomCenter.y],
-			BL: () => [this._content.bounds.bottomLeft.x, this._content.bounds.bottomLeft.y],
-			TL: () => [this._content.bounds.topLeft.x, this._content.bounds.topLeft.y],
-			TR: () => [this._content.bounds.topRight.x, this._content.bounds.topRight.y],
-			BR: () => [this._content.bounds.bottomRight.x, this._content.bounds.bottomRight.y],
-		};
 	}
 
-
 	/**
-	* Updates the position of the display frame.
-	* @param {any} input - The new position of the display frame.
-	* @throws {Error} If the input type is incorrect.
-	* @private
-	*/
+	 * Updates the position of the display frame.
+	 */
 
-	private updatePosition( input: PointLike ): void {
-
+	private updatePosition(input: PointLike): void {
 		const output = validatePointInput(input);
 
 		if (output) {
-
 			this._position = output;
-
 		} else {
-
-			throw new Error( "! ERROR@[DisplayObject][position]: wrong input type" );
+			throw new Error("! ERROR@[DisplayObject][position]: wrong input type");
 		}
 	}
 
-
 	/**
-	* Updates the size of the display frame.
-	* @param {any} input - The new size of the display frame.
-	* @throws {Error} If the input type is incorrect.
-	* @private
-	*/
+	 * Updates the size of the display frame.
+	 */
 
-	private updateSize( input: SizeLike ): void {
-		
+	private updateSize(input: SizeLike): void {
 		const output = validateSizeInput(input);
 
 		if (output) {
-			
 			this._size = output;
-			this._ratio = DisplayObject.getWidth(this._size) / DisplayObject.getHeight(this._size);
-
 		} else {
-
 			throw new Error("! ERROR@[DisplayObject][size]: wrong input type");
 		}
 	}
 
-  /**
-   * Gets the layer of the display frame.
-   * @returns {any} The layer.
-   */
-	get content() {
+	/**
+	 * Gets the layer of the display frame.
+	 */
+	get content(): any {
 		return this._content;
 	}
 
-
 	/**
-   * Gets the position of the display frame.
-   * @returns {any} The position.
-   */
-	set position( input: any ) {
-
-		this.placeAt( input );
+	 * Sets the position of the display frame.
+	 */
+	set position(input: any) {
+		this.placeAt(input);
 	}
 
-
-  /**
-   * Gets the position of the display frame.
-   * @returns {any} The position.
-   */
-	get position() {
+	/**
+	 * Gets the position of the display frame.
+	 */
+	get position(): any {
 		return this._position;
 	}
 
-  /**
-   * Gets the X coordinate of the display frame's position.
-   * @returns {number} The X coordinate.
-   */
-	get x() {
+	/**
+	 * Gets the X coordinate of the display frame's position.
+	 */
+	get x(): number {
 		return DisplayObject.getX(this._position);
 	}
 
-
 	/**
-	* Gets the Y coordinate of the display frame's position.
-	* @returns {number} The Y coordinate.
-	*/
-	
-	get y() {
+	 * Gets the Y coordinate of the display frame's position.
+	 */
+
+	get y(): number {
 		return DisplayObject.getY(this._position);
 	}
 
-
 	/**
-	* Sets the size of the display frame.
-	* @param {any} input - The size to set.
-	*/
-	
-	set size(input: any) {
-
-		this.updateSize(input);
-		this.render( null );
-	}
-
-
-	/**
-	* Gets the size of the display frame.
-	* @returns {any} The size.
-	*/
+	 * Gets the size of the display frame.
+	 */
 
 	get size(): any {
 		return this._size;
 	}
 
 	/**
-	* Gets the width of the display frame.
-	* @returns {number} The width.
-	*/
+	 * Gets the width of the display frame.
+	 */
 
-	get width() {
+	get width(): number {
 		return DisplayObject.getWidth(this._size);
 	}
 
 	/**
-	* Gets the height of the display frame.
-	* @returns {number} The height.
-	*/
+	 * Gets the height of the display frame.
+	 */
 
-	get height() {
+	get height(): number {
 		return DisplayObject.getHeight(this._size);
 	}
 
-  /**
-   * Gets a pin point of the display frame with an optional offset.
-   * @param {string} LABEL - The label of the pin point.
-   * @param {any} offset - The optional offset from the pin point.
-   * @returns {Point} The pin point.
-   * @protected
-   */
+	/**
+	 * Renders the display frame with the specified item.
+	 */
 
-	protected getPin(LABEL: string, offset: any): PointLike {
-
-		if (offset && validatePointInput(offset)) {
-
-			const position = this.pins[LABEL]();
-
-			return new Point(
-			                 DisplayObject.getX(position) + DisplayObject.getX(offset),
-			                 DisplayObject.getY(position) + DisplayObject.getY(offset)
-			                 );
-
-		} else {
-
-			return this.pins[LABEL]();
-		}
-	}
-
-
-  /**
-   * Renders the display frame with the specified size.
-   * @param {any} size - The size to render the display frame with.
-   * @throws {Error} If no size is provided.
-   */
-
-	protected render( item: any ): void {
-		
-		if ( item && !this.isRendered ) {
-
+	protected render(item: IPath | IGroup): void {
+		if (item && !this.isRendered) {
 			this._content = item;
-
-			this._content.visible = true;
-
+			this._content.visibility = true;
 			this.isRendered = true;
-
 		} else {
-
-			throw new Error( "! ERROR@[DisplayObject][render]: there's nothing to render" );
+			throw new Error("! ERROR@[DisplayObject][render]: there's nothing to render");
 		}
 	}
 
-
-  /**
+	/**
    * Places the display frame at the specified position.
-   * @param {any} position - The position to place the display frame at.
-
    */
 
-	public placeAt( position: PointLike, pivot?: PointLike ): void {
+	public placeAt(position: PointLike, pivot?: PointLike): void {
+		this.updatePosition(position);
 
-		this.updatePosition( position );
+		// if ( !this.isRendered && this._content ) {
+		if ( this._content ) {
 
-		if ( pivot ) {
+			if (pivot) {
+				this._content.pivot = validatePointInput(pivot);
+			}
 
-			this._content.pivot = validatePointInput( pivot );
+			this._content.position = this._position;
 		}
-
-		this._content.position = this._position;
-
 	}
 
-
-  /**
-   * Removes the display frame from the layer.
-   */
+	/**
+	 * Removes the display frame from the layer.
+	 */
 	public remove(): void {
-
-		if (this.isRendered && !this.isRemoved) {
-			
+		if (this.isRendered && !this.isRemoved && this._content) {
 			this._content.remove();
 			this.isRemoved = true;
 		}
 	}
 
-  /**
-   * Updates the display frame.
-   * @abstract
-   */
-	protected update() {};
+	/**
+	 * Updates the display frame.
+	 */
+	protected update() {}
 }
 
 export default DisplayObject;
-
-
-

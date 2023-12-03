@@ -28,7 +28,7 @@ import thumbFassPlugin from "../public/img/project_thumb_fass_plugin.png";
 import thumbArborator from "../public/img/project_thumb_arborator.png";
 import thumbPolystar from "../public/img/project_thumb_polystar.png";
 
-import { init, resize, update, generate } from "./demo-two/main";
+import { init, resize, update, generate } from "./cover-interactive/main";
 
 const projectsData = [
   {
@@ -174,7 +174,7 @@ export default function Home() {
 
           <div className={styles.projects}>
             {projectsData.map((p) => (
-              <ProjectCard title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link}/>
+              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link}/>
             ))}
           </div>
         </div>

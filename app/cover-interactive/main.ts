@@ -1,8 +1,7 @@
 declare const paper: any;
 
-import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
 import { IPath } from "../lib/topo/types";
-import { degToRad, genRandom, genRandomDec } from "../lib/topo/utils/helpers";
+import { degToRad } from "../lib/topo/utils/helpers";
 
 import { setStyle, createSineWave, createFlatLine } from "./waves";
 
@@ -91,8 +90,6 @@ function calculateFrequency(position: { x: number; y: number }, origin: any, rad
 //     }
 // }
 
-
-
 export function init(margin: number, density: number) {
 	// ...
 	paper.project.clear();
@@ -140,7 +137,7 @@ function createGrid(width: number, height: number, margin: number, density: numb
 	// ...
 	const mt = height * margin;
 	const mb = height * 0;
-	const h = (height-mt) / density;
+	const h = (height - mt) / density;
 	const x = width / 2;
 
 	const plots: PlotType[] = [];
@@ -168,15 +165,15 @@ export function generate() {
 	// const ix = Math.floor(freq * x);
 
 	const flatLine: IPath = createFlatLine({ x: 0, y: 0 }, view.size.width, 1);
-	flatLine.visible = false;
+	flatLine.visibility = false;
 
 	// for ( const p of grid ) {
 
 	// 	p.frequency = baseFreq + genRandom(0, 20);
 	// }
 
-		stepper += 1;
-		time = Math.sin(degToRad(stepper));
+	stepper += 1;
+	time = Math.sin(degToRad(stepper));
 
 	grid.forEach((n, i) => {
 		// const color = new paper.Color(n.color);
@@ -200,33 +197,39 @@ export function generate() {
 		} else {
 			// createFlatLine(n.position, n.length, ny);
 			flatLine.clone();
-			flatLine.visible = true;
+			flatLine.visibility = true;
 			flatLine.position = n.position;
 			flatLine.strokeColor = n.color;
 			// n.compression = 0;
 		}
 		// if ( n.frequency > 5 && n.frequency < 30) {
 		// 		n.frequency = baseFreq + Math.floor(10 * time);
-		// } 
+		// }
 		// console.log("!! ",  time);
-
 	});
 }
 
 export function _generate() {
-	const effectRadius = 200;
-	const freq = 25;
+	const i = 15;
+
+	const n = grid[i];
+
 	const nx = origin.x / view.size.width;
-	// const ix = Math.floor(freq * x);
 
-	const plot = grid[10];
+	const ny = i / rowNum;
+	const nf = n.frequency / baseFreq;
 
-	const color = new paper.Color(plot.color);
-	setStyle({ color });
+	const nextColor = new paper.Color(n.color);
+	nextColor.green = i / rowNum;
+	n.color = nextColor;
 
-	if (proximitySensor(plot.position, origin, effectRadius)) {
-		const amp = calculateAmplitude(plot.position, origin, effectRadius);
-		createSineWave(plot.position, plot.length, freq, amp, nx, 1, 1);
-		// console.log("...generating wave: ", amp);
+	// const amp = calculateAmplitude(n.position, origin, effectRadius) * 2;
+	const amp = 50;
+
+	if (proximitySensor(n.position, origin, effectRadius)) {
+		setStyle({ color: n.color });
+		createSineWave(n.position, n.length / 2, n.frequency, amp, n.compression, nx, ny, nf);
+
+		// n.color = nextColor;
 	}
 }

@@ -1,254 +1,232 @@
-import { OrientationType, PolarityType, IAttractor, IAttractorObject, IHyperPoint, VectorDirection, PointLike, SizeLike, IAttractorField } from '../types';
+import {
+	OrientationType,
+	PolarityType,
+	IAttractor,
+	IHyperPoint,
+	VectorDirection,
+	PointLike,
+	SizeLike,
+    IPath,
+} from "../types";
 
-import DisplayNode from './displayNode';
-import AttractorObject from './attractorObject';
-import HyperPoint from './hyperPoint';
-
+import DisplayNode from "./displayNode";
+import AttractorObject from "./attractorObject";
 
 abstract class AttractorField extends DisplayNode {
-
-
 	protected _attractor: IAttractor | undefined;
 
 	private _span: Array<number>;
 	private _shift: number;
-	
+
 	private _axisAngle: number;
 
 	public isDisabled: boolean;
 	public isSelfAnchored: boolean;
 	public isAxisLocked: boolean;
-	
 
-	constructor(  position: PointLike, size: SizeLike ) {
-
-		super( position, size )
+	constructor(position: PointLike, size?: SizeLike) {
+		super(position, size);
 
 		this._axisAngle = 0;
 
-		this._span = [ 0, 1 ];
+		this._span = [0, 1];
 		this._shift = 0;
-
 
 		this.isDisabled = false;
 		this.isAxisLocked = false;
 		this.isSelfAnchored = false;
-
-	}	
+	}
 
 	get attractor() {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
 		return this._attractor;
 	}
 
 	get anchor() {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
 		return this._attractor?.anchor;
-		
-	};
+	}
 
 	get attractors() {
-
 		return this.getChildren();
 	}
 
 	get firstAttractor() {
-
 		return this.getFirstChild();
 	}
 
 	get lastAttractor() {
-
 		return this.getLastChild();
 	}
 
-	set orientation( value: OrientationType ) {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+	set orientation(value: OrientationType) {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
 		this._attractor.orientation = value;
 	}
 
 	get orientation() {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
 		return this._attractor.orientation;
 	}
 
-	set polarity( value: PolarityType ) {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+	set polarity(value: PolarityType) {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 		this._attractor.polarity = value;
 	}
 
 	get polarity() {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 		return this._attractor.polarity;
 	}
 
-	set axisAngle( value: number ) {
-
+	set axisAngle(value: number) {
 		this._axisAngle = value;
 	}
 
-
 	get axisAngle() {
-
 		return this._axisAngle;
 	}
 
 	// MUST BE IMPLEMENTED BY THE SUBCLASSES
-	protected configureAttractor( att: IAttractor, anchor: IHyperPoint ) {}
-
+	protected configureAttractor(att: IAttractor, anchor: IHyperPoint) {}
 
 	protected filterAttractors() {
-
-		const attractors = this.getChildren()
-			.filter( att => !att.isDisabled && !att.isSelfAnchored );
+		const attractors = this.getChildren().filter((att) => !att.isDisabled && !att.isSelfAnchored);
 
 		return attractors;
 	}
 
+	protected arrangeAttractors(attractors: Array<IAttractor>, pTest: boolean = false) {
+		if (!this._attractor || !this._attractor.path) {
+			throw new Error("AttractorField has no base attractor");
+		}
 
-	protected arrangeAttractors( attractors: Array<IAttractor>, pTest: boolean = false ) {
+		console.log('arrange attractors')
 
+		const start = this._span[0];
+		const end = this._span[1];
 
-		if ( !this._attractor ) { throw new Error('AttractorField has no base attractor'); }
+		const span = end - start;
 
+		let len = !this._attractor.path.closed || pTest ? attractors.length - 1 : attractors.length;
 
-		const start = this._span[0]
-		const end = this._span[1]
+		const step = span / Math.max(len, 1);
 
-		const span = end - start
+		for (let i = 0; i < attractors.length; i++) {
+			const attractor = attractors[i];
 
-		let len = !this._attractor.path.closed || pTest ? attractors.length-1 : attractors.length;
+			const position =
+				this._shift + start + step * i > 1
+					? this._shift + start + step * i - 1
+					: this._shift + start + step * i;
 
-
-		const step = span / ( Math.max( len, 1 ));
-
-		for ( let i = 0; i < attractors.length; i++ ) {
-
-			const attractor = attractors[i]
-
-			const position = ( this._shift + start + step*i ) > 1  ? ( this._shift + start + step*i ) - 1 : ( this._shift + start + step*i );
-
-			const anchor = attractor.isSelfAnchored ? this._attractor.locate( attractor.anchor.position ) : this._attractor.locate( position );
+			const anchor = attractor.isSelfAnchored
+				? this._attractor.locate(attractor.anchor.position)
+				: this._attractor.locate(position);
 
 			attractor.reset();
 
-			this.configureAttractor( attractor, anchor );
+			this.configureAttractor(attractor, anchor);
 
-			attractor.anchorAt( anchor );
-		
-		} 
-	};
+			attractor.anchorAt(anchor)
+		}
+	}
 
-
-	public getAttractor( i?: number ): any {
-
-		if ( typeof i === 'number' ) {
-
-			return this.getChild( i );
-
+	public getAttractor(i?: number): any {
+		if (typeof i === "number") {
+			return this.getChild(i);
 		} else {
-
 			return this._attractor!;
 		}
-	};
+	}
 
-
-	public locate( at: number, orient: boolean = false ): IHyperPoint[] {
-
+	public locate(at: number, orient: boolean = false): IHyperPoint[] {
 		const attractors = this.filterAttractors();
-		const anchors = attractors
-		  .filter( att => !att.isToSkip )
-		  .map( att => att.locate( at, orient ) );
+		const anchors = attractors.filter((att) => !att.isToSkip).map((att) => att.locate(at, orient));
 
 		// return _.flatten( anchors );
 		return anchors.flat();
-
 	}
 
 	// -------------------------------------------------------
 	// locate on a specified attractor
 
-	public locateOn( attractor: IAttractor | number, at: number, orient: boolean = false ) {
-
-		
-		if ( attractor instanceof AttractorObject ) {
-
-			return attractor.locate( at )
-
-		} else if ( typeof attractor === 'number' ) {
-
-			return this.getChild( attractor ).locate( at, orient );
+	public locateOn(attractor: IAttractor | number, at: number, orient: boolean = false) {
+		if (attractor instanceof AttractorObject) {
+			return attractor.locate(at);
+		} else if (typeof attractor === "number") {
+			return this.getChild(attractor).locate(at, orient);
 		}
-	};
+	}
 
+	public addAttractor(attractor: IAttractor, at?: number): void {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
-	public addAttractor( attractor: IAttractor, at?: number ): void {
+		console.log('add attractor')
 
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
-
-		this.add( attractor );
+		this.add(attractor);
 
 		// if ( attractor._dimension === null )  { attractor._dimension = this.getChildren().length }
 
 		// ------------------------------------------------------------
-		// 	
+		//
 
-		if ( typeof at === 'number' ) {
+		if (typeof at === "number") {
+			const anchor = this._attractor.locate(at);
 
-			const anchor = this._attractor.locate( at );
-
-			attractor.reset()
+			attractor.reset();
 			attractor.isSelfAnchored = true;
 
-			this.configureAttractor( attractor, anchor );
-			attractor.anchorAt( anchor );
-			
-	
-		// ------------------------------------------------------------
-		// 
+			this.configureAttractor(attractor, anchor);
+			attractor.anchorAt(anchor);
 
+			// ------------------------------------------------------------
+			//
 		} else {
-
-			this.arrangeAttractors( this.filterAttractors() );
+			this.arrangeAttractors(this.filterAttractors());
 		}
 	}
 
-	public addAttractors( attractors: Array<IAttractor> ) {
+	public addAttractors(attractors: IAttractor[]) {
+		this.addMany(attractors);
 
-		this.addMany( attractors );
-
-		this.arrangeAttractors( attractors );
+		this.arrangeAttractors(attractors);
 	}
 
+	public anchorAt(anchor: IHyperPoint, along: VectorDirection = "RAY") {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
+		this._attractor.anchorAt(anchor, along);
 
-	public anchorAt( anchor: IHyperPoint, along: VectorDirection = 'RAY' ) {
+		this.arrangeAttractors(this.filterAttractors());
+	}
 
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
-
-		this._attractor.anchorAt( anchor, along );
-
-		this.arrangeAttractors( this.filterAttractors() );
-	};
-
-
-	public placeAt( position: any, pivot: any ): void {
-
+	public placeAt(position: any, pivot: any): void {
 		// const iPos = this.position;
 
-		super.placeAt( position, pivot );
+		super.placeAt(position, pivot);
 
-		this.arrangeAttractors( this.filterAttractors() );
+		this.arrangeAttractors(this.filterAttractors());
 
 		// for ( const att of this.getChildren() ) {
 
@@ -256,45 +234,39 @@ abstract class AttractorField extends DisplayNode {
 
 		// 	att.placeAt( pos )
 		// }
-	};
+	}
 
+	public moveBy(by: number, along: any) {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
-	public moveBy( by: number, along: any ) {
+		this._attractor.anchor.offsetBy(by, along);
 
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
-
-		this._attractor.anchor.offsetBy( by, along );
-
-		this.placeAt( this._attractor.anchor.point, null );
+		this.placeAt(this._attractor.anchor.point, null);
 
 		return this;
-	};
+	}
 
-	
-	public scale( hor: number, ver: number, scaleField: boolean = false ): any {
-
-		if ( scaleField ) {
-
+	public scale(hor: number, ver: number, scaleField: boolean = false): any {
+		if (scaleField) {
 			// TODO
-
 		} else {
-
-			for ( const att of this.filterAttractors() ) {
-
-				att.scale( hor, ver );
-				att.rotate( att.anchor.normal.angle );
+			for (const att of this.filterAttractors()) {
+				att.scale(hor, ver);
+				att.rotate(att.anchor.normal.angle);
 			}
 		}
 
 		return this;
-	};
-
+	}
 
 	// Rotates the node together with its childs
 
-	public rotate( angle: number ) {
-
-		if ( !this._attractor ) { throw new Error('Attractor Field has no defined base attractor') };
+	public rotate(angle: number) {
+		if (!this._attractor) {
+			throw new Error("Attractor Field has no defined base attractor");
+		}
 
 		// if ( !this._attractor.isAxisLocked ) {
 
@@ -302,7 +274,7 @@ abstract class AttractorField extends DisplayNode {
 		// 	this._attractor.axisAngle += angle;
 		// }
 
-		this._attractor.rotate( angle );
+		this._attractor.rotate(angle);
 
 		// const group = new Group();
 
@@ -315,106 +287,95 @@ abstract class AttractorField extends DisplayNode {
 
 		// group.pivot = this._content.position;
 
-		// group.rotate( angle )	
+		// group.rotate( angle )
 	}
 
 	// Rotates the childs around the node
 
-	public revolve( angle: number ) {
-
+	public revolve(angle: number) {
 		const delta = angle; // TODO angles need to be normalized to 0... 1
 
 		this._shift = delta;
 
-		this.arrangeAttractors( this.filterAttractors() );
+		this.arrangeAttractors(this.filterAttractors());
 
 		return this;
-
 	}
 
-	public spin( angle: number ) {
-
-		for ( const att of this.filterAttractors() ) {
-
-			att.rotate( angle );
+	public spin(angle: number) {
+		for (const att of this.filterAttractors()) {
+			att.rotate(angle);
 		}
 
 		return this;
 	}
 
-
-	public fold( amount: any, alignAxis: boolean = true ) {
-
+	public fold(amount: any, alignAxis: boolean = true) {
 		// const start = this._span[0];
-		// const end = this._span[1];		
+		// const end = this._span[1];
 
 		const start = this._span[0];
 		const end = this._span[1];
 
 		let factor = this.filterAttractors().length === 2 ? 3 : this.filterAttractors().length === 3 ? 2 : 1.5;
 
-		if ( amount >= 0 ) {
-
-			this._span = [ start+amount, end-amount*factor ];
-
+		if (amount >= 0) {
+			this._span = [start + amount, end - amount * factor];
 		} else {
-
-			this._span = [ end+amount, start-amount*factor ];
+			this._span = [end + amount, start - amount * factor];
 		}
 
-		const attractors = this.filterAttractors().map( (att) => { att.isAxisLocked=!alignAxis; return att } );
+		const attractors = this.filterAttractors().map((att) => {
+			att.isAxisLocked = !alignAxis;
+			return att;
+		});
 
-		this.arrangeAttractors( attractors, true );
+		this.arrangeAttractors(attractors, true);
 
 		return this;
 	}
 
+	public compress(start: any, end: any, alignAxis: boolean = true) {
+		this._span = [start, end];
 
+		const attractors = this.filterAttractors().map((att) => {
+			att.isAxisLocked = !alignAxis;
+			return att;
+		});
 
-	public compress( start: any, end: any, alignAxis: boolean = true ) {
-
-		this._span = [ start, end ];
-
-		const attractors = this.filterAttractors().map( (att) => { att.isAxisLocked=!alignAxis; return att } );
-
-		this.arrangeAttractors( attractors, true );
+		this.arrangeAttractors(attractors, true);
 
 		return this;
 	}
 
-
-	public expandBy( by: any, along: string ) {
-
-		for ( const att of this.filterAttractors() ) {
-
-			att.moveBy( by, along );
+	public expandBy(by: any, along: string) {
+		for (const att of this.filterAttractors()) {
+			att.moveBy(by, along);
 		}
 
 		return this;
+	}
+
+	protected render(item: IPath) {
+		super.render(item);
 	}
 
 	public reset(): void {
-
-
-		for ( const att of this.getChildren() ) {
-
+		for (const att of this.getChildren()) {
 			att.reset();
 		}
 
-		if ( this._attractor ) { this._attractor.reset() };
-		this.render( null );
+		if (this._attractor) {
+			this._attractor.reset();
+		}
 	}
 
-
-	public remove(): void { 
-
-		if ( this._attractor ) { this._attractor.remove() };
-		super.clear();
+	public remove(): void {
+		if (this._attractor) {
+			this._attractor.remove();
+		}
+		super.remove();
 	}
- 
 }
 
-
 export default AttractorField;
-
-

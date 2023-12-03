@@ -1,116 +1,108 @@
-import { OrientationType, PolarityType, PathLocationData, BooleanLike, VectorDirection, IPoint, IHyperPoint, PointLike, SizeLike } from '../types';
+import {
+	OrientationType,
+	PolarityType,
+	PathLocationData,
+	VectorDirection,
+	IHyperPoint,
+	IPath,
+} from "../types";
 
-import DisplayObject from './displayObject';
-import HyperPoint from './hyperPoint';
-import { convertToHyperPoint } from '../utils/converters';
+import DisplayObject from "./displayObject";
+import HyperPoint from "./hyperPoint";
+import { convertToHyperPoint } from "../utils/converters";
 
 abstract class AttractorObject extends DisplayObject {
-
 	protected _orientation: OrientationType;
 	protected _polarity: PolarityType;
 
-	protected _path: any;
+	protected _path: IPath | null = null;
 	protected _anchor: IHyperPoint;
 
 	// protected _radius: SizeLike | number;
 
 	private _axisAngle: number;
-	
+
 	// STATES. Set at creation time and meant to preserve original settings during transformations and redrawing.
-	// The default is for the fields to organically adjust the attractors. These state properties allow to 
+	// The default is for the fields to organically adjust the attractors. These state properties allow to
 	// designate attractors to ignore the settings coming from the parent field.
-	
+
 	public isDisabled: boolean;
 	public isSelfAnchored: boolean;
 	public isAxisLocked: boolean;
 
+	constructor(position: IHyperPoint, path?: IPath) {
+		super(position, path?.size);
 
-	constructor( size: SizeLike, position: PointLike = {x:0, y:0} ) {
-
-		super( position, size );
+		this._path = path || null;
 
 		this._orientation = 1;
 		this._polarity = 1;
 
-		this._anchor = convertToHyperPoint(position);
+		this._anchor = position;
 
 		// this._radius = 0; // The radius value will depend on the type of attractor eg. Orbital, Spine and therefore it is defined by the subclass.
 
 		this._axisAngle = 0;
-		
+
 		this.isDisabled = false;
 		this.isAxisLocked = false;
 		this.isSelfAnchored = false;
+	}
 
-	};
+	protected abstract getPathLocationDataAt(pos: number): PathLocationData;
+	protected abstract adjustToOrientation(anchor: any, isPositive: Function, isNegative: Function): void;
+	protected abstract adjustToPolarity(anchor: any): void;
 
-	protected abstract getPathLocationDataAt( pos: number ): PathLocationData;
-	protected abstract adjustToOrientation( anchor: any, isPositive: Function, isNegative: Function ): void;
-	protected abstract adjustToPolarity( anchor: any ): void;
-
-
-	set orientation( value: OrientationType ) {
-
+	set orientation(value: OrientationType) {
 		this._orientation = value;
-	};
-
+	}
 
 	get orientation() {
-
 		return this._orientation;
-	};
+	}
 
-
-	set polarity( value: PolarityType ) {
-
+	set polarity(value: PolarityType) {
 		this._polarity = value;
-
-	};
-
+	}
 
 	get polarity() {
-
 		return this._polarity;
-	};
+	}
 
-
-	set axisAngle( value: number ) {
-
+	set axisAngle(value: number) {
 		this._axisAngle = value;
 	}
 
-
 	get axisAngle() {
-
 		return this._axisAngle;
 	}
 
-
 	// anchor is set when the attractor is placed in a field
 
-	set anchor( pt: IHyperPoint ) {
-
-		console.log(`!ERROR @AttractorObject: Anchor cannot be set directly. Attractor must be placed in and by a Field to be assigned an anchor`);
+	set anchor(pt: IHyperPoint) {
+		console.log(
+			`!ERROR @AttractorObject: Anchor cannot be set directly. Attractor must be placed in and by a Field to be assigned an anchor`,
+		);
 
 		// this._anchor = value;
-	};
-
+	}
 
 	get anchor() {
-
 		return this._anchor;
-	};
-
+	}
 
 	get path() {
-
 		return this._path;
-	};
+	}
 
 	get center() {
 
-		return convertToHyperPoint( this._path.bounds.center );
-	};
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.center: path is missing!`)
+		}
+
+		return convertToHyperPoint(this._path.center);
+	}
 
 	// set radius( value: SizeLike | number ) {
 
@@ -125,35 +117,27 @@ abstract class AttractorObject extends DisplayObject {
 	// }
 
 	get length() {
-
-		return this._path.length;
-	};
-
+		if (this._path) {
+			return this._path.length;
+		}
+	}
 
 	public getPath() {
+		if (!this._path) {
+			throw new Error(`ERROR @AttractorObject.getPath(): no path found!`)
+		}
 
 		return this._path.clone();
-	};
-
+	}
 
 	// at is provided by attractors that have paths that are non-linear ie. the input location doesn't match the mapped location.
-	private createAnchor({
-	    
-	    point,
-	    tangent,
-	    normal,
-	    curveLength,
-	    pathLength,
-	    at,
+	private createAnchor({ point, tangent, normal, curveLength, pathLength, at }: PathLocationData): IHyperPoint {
+		const factor = [0, 0.25, 0.5, 0.75].includes(at) ? 1 / 3 : curveLength / pathLength;
 
-	}: PathLocationData ): IHyperPoint {
-		
-		const factor = [0, 0.25, 0.50, 0.75 ].includes(at) ? 1/3 : curveLength/pathLength;
+		const hIn = tangent.multiply(curveLength * factor).multiply(-1);
+		const hOut = tangent.multiply(curveLength * factor);
 
-		const hIn = tangent.multiply( curveLength * factor ).multiply( -1 );
-		const hOut = tangent.multiply( curveLength * factor );		
-
-		const anchor = new HyperPoint( point, hIn, hOut );
+		const anchor = new HyperPoint(point, hIn, hOut);
 
 		anchor.position = at;
 		anchor.tangent = tangent.multiply(this._orientation); // HACK: because the path is flipped using scale() the vectors need to be inverted
@@ -162,215 +146,205 @@ abstract class AttractorObject extends DisplayObject {
 		anchor.polarity = this._polarity;
 
 		return anchor;
-	};
+	}
 
-
-	public anchorAt( anchor: IHyperPoint, along: VectorDirection = 'RAY'): void {
+	public anchorAt(anchor: IHyperPoint, along: VectorDirection = "RAY"): void {
+		
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.anchorAt(...): path is missing!`)
+		}
 
 		this._anchor = anchor;
 		this._anchor.spin = this._orientation;
 
-		if ( !this.isAxisLocked ) {
+		if (!this.isAxisLocked) {
+			if (along === "TAN") {
+				if (!anchor.tangent) {
+					throw new Error("Attractor anchor missing tangent vector");
+				}
 
-			if ( along === 'TAN' ) {
-
-				if ( !anchor.tangent ) { throw new Error('Attractor anchor missing tangent vector') };
-
-				this._content.rotation = anchor.tangent.angle;
-
+				// this._content.rotation = anchor.tangent.angle;
+				this._path.rotation = anchor.tangent.angle;
 			} else {
-
-				if ( !anchor.normal ) { throw new Error('Attractor anchor missing normal vector') };
-
-				this._content.rotation = anchor.normal.angle;
-			}	
-		}
-		
-		this.rotate( this.axisAngle );
-		this.placeAt( this._anchor.point, this._path.position );
-
-	};
-
-
-	public extractPath( A: IHyperPoint | number, B: IHyperPoint | number ) {
-
-		let P1;
-		let P2;
-
-		if ( typeof A === 'number' ) {
-
-			P1 = this.getPathLocationDataAt( A ).point;
-
-		} else if ( A.point ) {
-
-			P1 = this._path.getNearestLocation( A.point ).point;
+				if (!anchor.normal) {
+					throw new Error("Attractor anchor missing normal vector");
+				}
+				console.log("rotation", this._path)
+				// this._content.rotation = anchor.normal.angle;
+				this._path.rotation = anchor.normal.angle;
+			}
 		}
 
+		this.rotate(this.axisAngle);
+		this.placeAt(this._anchor.point, this._path.position);
+	}
 
-		if ( typeof B === 'number' ) {
+	// public extractPath(A: IHyperPoint | number, B: IHyperPoint | number) {
+	// 	let P1;
+	// 	let P2;
 
-			P2 = this.getPathLocationDataAt( B ).point;
+	// 	if (typeof A === "number") {
+	// 		P1 = this.getPathLocationDataAt(A).point;
+	// 	} else if (A.point) {
+	// 		P1 = this._path.getNearestLocation(A.point).point;
+	// 	}
 
-		} else if ( B.point ) {
+	// 	if (typeof B === "number") {
+	// 		P2 = this.getPathLocationDataAt(B).point;
+	// 	} else if (B.point) {
+	// 		P2 = this._path.getNearestLocation(B.point).point;
+	// 	}
 
-			P2 = this._path.getNearestLocation( B.point ).point;
-		}
+	// 	const extractedPath = this._path.clone();
 
+	// 	extractedPath.splitAt(extractedPath.getNearestLocation(P1));
+	// 	let discardedPath = extractedPath.splitAt(extractedPath.getNearestLocation(P2));
 
-		const extractedPath = this._path.clone()
+	// 	// extractedPath.strokeColor = 'red';
+	// 	// extractedPath.strokeWidth = 5;
 
-		extractedPath.splitAt( extractedPath.getNearestLocation( P1 ) )
-		let discardedPath = extractedPath.splitAt( extractedPath.getNearestLocation( P2 ) )
+	// 	discardedPath.remove();
 
-		// extractedPath.strokeColor = 'red';
-		// extractedPath.strokeWidth = 5;
+	// 	return extractedPath;
+	// }
 
-		discardedPath.remove();
+	public locate(at: number, orient: boolean = false) {
+		const locationData = this.getPathLocationDataAt(at);
 
-		return extractedPath;
+		if (locationData) {
+			const pt = this.createAnchor(locationData);
 
-	};
-
-
-	public locate( at: number, orient: boolean = false  ) { 
-
-		const locationData = this.getPathLocationDataAt( at );
-
-		if ( locationData ) {
-
-			const pt = this.createAnchor( locationData );
-
-			if ( orient && this._orientation === -1 ) { return pt.flip() } 
+			if (orient && this._orientation === -1) {
+				return pt.flip();
+			}
 
 			return pt;
-
 		} else {
-
-			throw new Error( `! ERROR @AttractorObject.locate() : Unable to locate at ${at}`);
+			throw new Error(`! ERROR @AttractorObject.locate() : Unable to locate at ${at}`);
 		}
-	};
+	}
 
+	// public locateFirstIntersection(item: any, orient: boolean = false) {
+	// 	// TODO: returns a hyperpoint
 
-	public locateFirstIntersection( item: any, orient: boolean = false ) { // TODO: returns a hyperpoint
+	// 	if (item instanceof AttractorObject) {
+	// 		const intersections = this._path.getIntersections(item.getPath());
 
-		if ( item instanceof AttractorObject ) {
+	// 		if (intersections.length > 0) {
+	// 			const curveLocation = intersections[0];
 
-			const intersections = this._path.getIntersections( item.getPath() );
+	// 			const pt = this.createAnchor({
+	// 				point: curveLocation.point,
+	// 				tangent: curveLocation.tangent,
+	// 				normal: curveLocation.normal,
+	// 				curveLength: curveLocation.curve.length,
+	// 				pathLength: curveLocation.path.length,
+	// 				at: curveLocation.offset / curveLocation.path.length,
+	// 			});
 
-			if ( intersections.length > 0 ) {
+	// 			if (orient && this._orientation === -1) {
+	// 				return pt.flip();
+	// 			}
 
-				const curveLocation = intersections[0];
+	// 			return pt;
+	// 		}
+	// 	}
+	// }
 
-				const pt = this.createAnchor( {   
+	// public locateLastIntersection(item: any, orient: boolean = false) {
+	// 	if (item instanceof AttractorObject) {
+	// 		const intersections = this._path.getIntersections(item.getPath());
 
-					point: curveLocation.point, 
-					tangent: curveLocation.tangent, 
-					normal: curveLocation.normal, 
-					curveLength: curveLocation.curve.length, 
-					pathLength: curveLocation.path.length, 
-					at: curveLocation.offset / curveLocation.path.length
+	// 		if (intersections.length > 0) {
+	// 			const curveLocation = intersections.slice(-1)[0];
 
-				});
+	// 			const pt = this.createAnchor({
+	// 				point: curveLocation.point,
+	// 				tangent: curveLocation.tangent,
+	// 				normal: curveLocation.normal,
+	// 				curveLength: curveLocation.curve.length,
+	// 				pathLength: curveLocation.path.length,
+	// 				at: curveLocation.offset / curveLocation.path.length,
+	// 			});
 
-				if ( orient && this._orientation === -1 ) { return pt.flip() }
+	// 			if (orient && this._orientation === -1) {
+	// 				return pt.flip();
+	// 			}
 
-				return pt;
-			}
-		}
-	};
+	// 			return pt;
+	// 		}
+	// 	}
+	// }
 
+	public moveBy(by: number, along: VectorDirection) {
+		this._anchor.offsetBy(by, along);
 
-	public locateLastIntersection( item: any, orient: boolean = false ) {
-
-		if ( item instanceof AttractorObject ) {
-
-			const intersections = this._path.getIntersections( item.getPath() );
-
-			if ( intersections.length > 0 ) {
-
-				const curveLocation = intersections.slice(-1)[0];
-
-				const pt = this.createAnchor({
-
-					point: curveLocation.point, 
-					tangent: curveLocation.tangent, 
-					normal: curveLocation.normal, 
-					curveLength: curveLocation.curve.length, 
-					pathLength: curveLocation.path.length, 
-					at: curveLocation.offset / curveLocation.path.length
-				})
-
-				if ( orient && this._orientation === -1 ) { return pt.flip() }
-
-				return pt;
-			}
-		}
-	};
-
-
-	public moveBy( by: number, along: VectorDirection ) {
-
-		this._anchor.offsetBy( by, along );
-
-		this.placeAt( this._anchor.point );
+		this.placeAt(this._anchor.point);
 
 		return this;
-	};
-
+	}
 
 	public reverse() {
 
-		this._content.reverse();
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.reverse(): path is missing!`)
+		}
 
-		return this;		
-	};
+		this._path.reverse();
 
+		return this;
+	}
 
-	public scale( hor: number, ver: number ) {
+	public scale(hor: number, ver: number) {
 
-		this._content.scale( hor, ver );
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.scale(): path is missing!`)
+		}
+
+		this._path.scale(hor, ver);
 		// this._radius = this._content.bounds.width;
 
 		return this;
-	};
+	}
 
-	public skew( vector: PointLike ): any {
+	public rotate(angle: number) {
 
-		// this._path.scale( hor, ver )
-		this._content.shear( vector, this._path.position );
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.rotate(): path is missing!`)
+		}
 
-		return this;	
-	};
-
-
-	public rotate( angle: number ) {
-
-		if ( !this.isAxisLocked ) {
-
-			this._content.rotate( angle * this._orientation, this._anchor.point );
+		if (!this.isAxisLocked) {
+			this._path.rotate(angle * this._orientation, this._anchor.point);
+			// this._path.rotate(angle * this._orientation);
 			this.axisAngle += angle;
 		}
-	};
+	}
 
+	// protected render(path: IPath) {
+	// 	super.render(path);
+	// }
 
 	public reset() {
-		
-		this.remove();
-		this.render( null );
-	};
 
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.reset(): path is missing!`)
+		}
+
+		this.remove();
+		this.render(this._path);
+	}
 
 	public remove() {
 
-		if ( this.isRendered ) {
-
-			this._content.remove();
+		if ( !this._path ) {
+			throw new Error(`ERROR @AttractorObject.remove(): path is missing!`)
 		}
-	};
 
+		if (this.isRendered) {
+			this._path.remove();
+		}
+		super.remove();
+	}
 }
 
-
-export default AttractorObject
-
-
+export default AttractorObject;

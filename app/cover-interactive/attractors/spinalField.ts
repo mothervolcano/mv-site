@@ -1,18 +1,10 @@
 import {
-	OrientationType,
-	PolarityType,
-	PathLocationData,
 	IHyperPoint,
-	PointLike,
-	SizeLike,
 	IAttractor,
 } from "../../lib/topo/types";
 
 import AttractorField from "../../lib/topo/core/attractorField";
 import Spine from "./spine";
-import Orbital from "./orbital";
-
-import { isEven, isOdd } from "../../lib/topo/utils/helpers";
 
 class SpinalField extends AttractorField {
 	private _positionData: any;
@@ -20,7 +12,7 @@ class SpinalField extends AttractorField {
 	private _length: number;
 	private _mode: string;
 
-	#alternator: boolean = false;
+	private _alternator: boolean = false;
 
 	constructor(
 		positionData: IHyperPoint | [IHyperPoint, IHyperPoint],
@@ -29,7 +21,7 @@ class SpinalField extends AttractorField {
 	) {
 		const _path = Spine.project(positionData, length);
 
-		super(_path.getPointAt(_path.length / 2), _path.bounds.size);
+		super(_path.getPointAt(_path.length / 2));
 
 		this._positionData = positionData;
 
@@ -42,12 +34,12 @@ class SpinalField extends AttractorField {
 	}
 
 	private alternate() {
-		this.#alternator = !this.#alternator;
+		this._alternator = !this._alternator;
 	}
 
 	protected render() {
-		if (this.isRendered) {
-			this._content.remove();
+		if (this.isRendered && this.content) {
+			this.content.remove();
 			this.isRendered = false;
 		}
 
@@ -57,8 +49,8 @@ class SpinalField extends AttractorField {
 
 		this.arrangeAttractors(this.filterAttractors());
 
-		// super.render( this._attractor._content );
-		super.render(this._attractor.path);
+		super.render( this._attractor.content );
+		// super.render(this._attractor.path);
 	}
 
 	public adjustRotationToPosition(anchor: IHyperPoint, isPositive: Function, isNegative: Function) {
@@ -117,20 +109,20 @@ class SpinalField extends AttractorField {
 				att.adjustRotationToPosition(
 					anchor,
 					(pos: number) => {
-						return !this.#alternator;
+						return !this._alternator;
 					},
 					(pos: number) => {
-						return this.#alternator;
+						return this._alternator;
 					},
 				);
 
 				att.adjustToOrientation(
 					anchor,
 					(pos: number) => {
-						return this.#alternator;
+						return this._alternator;
 					}, // the condition of this field for the orientation to be 1
 					(pos: number) => {
-						return !this.#alternator;
+						return !this._alternator;
 					}, // the condition of this field for the orientation to be -1
 				);
 

@@ -19,9 +19,9 @@ class OrbitalField extends AttractorField {
 
 	protected render() {
 
-		if ( this.isRendered ) {
+		if ( this.isRendered && this.content ) {
 
-			this._content.remove();
+			this.content.remove();
 			this.isRendered = false;
 		}
 
@@ -34,8 +34,8 @@ class OrbitalField extends AttractorField {
 
 		this.arrangeAttractors( this.filterAttractors() );
 
-		// super.render( this._attractor._content );
-		super.render( this._attractor.path );
+		super.render( this._attractor.content );
+		// super.render( this._attractor.path );
 
 	};
 

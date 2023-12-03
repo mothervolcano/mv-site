@@ -43,13 +43,14 @@ export interface IDisplayObject {
   moveBy(vector: any, distance: number): void;
 }
 
-export interface IAttractor {
+export interface IAttractor extends DisplayObjectType {
   readonly anchor: IHyperPoint;
   isDisabled: boolean;
   isAxisLocked: boolean;
   isSelfAnchored: boolean;
   orientation: OrientationType;
   polarity: PolarityType;
+  path: IPath | null;
   anchorAt(anchor: IHyperPoint, along?: VectorDirection): void;
   locate(at: number, orient?: boolean): IHyperPoint | never;
   adjustRotationToPosition(
@@ -63,7 +64,9 @@ export interface IAttractor {
     isNegative: Function,
   ): void;
   adjustToPolarity(anchor: IHyperPoint): void;
+  rotate(angle: number): void;
   reset(): void;
+  remove(): void;
 }
 
 export interface IAttractorField {
@@ -103,6 +106,98 @@ export interface DisplayObjectType {
   position: any;
   size: any;
 }
+
+/**
+ * Represents a hyperpoint in a drawing.
+ *
+ * A hyperpoint is a point extracted from a curve that serves as a guide for drawing.
+ * It encapsulates the position, tangent, normal, and handles of the point.
+ * The hyperpoint is primarily defined at the moment of extraction from the curve.
+ *
+ * The HyperPoint class provides methods to manipulate and transform the point along its tangent or normal vector.
+ * It also allows setting the spin or orientation of the curve, as well as retrieving a segment object for creating or adding to a Path object.
+ *
+ * By retaining the tangent, normal, and other properties of the hyperpoint, it remains closely related to the underlying curve, enabling consistent modifications and adjustments to the drawing.
+ */
+
+export interface IHyperPoint {
+  /**
+   * x coordinate;
+   */
+  readonly x: number;
+
+  /**
+   * y coordinate;
+   */
+  readonly y: number;
+
+  /**
+   * xy representation of the HyperPoint;
+   */
+  readonly point: IPoint;
+
+  /**
+   * The position in the Attractor's path from where the HyperPoint was derived as a value between 0 and 1.
+   * It corresponds to value passed as the main parameter to AttractorObject.locate() or AttractorObject.anchorAt()
+   */
+  position: number;
+
+  /**
+   * The normalized vector representing the tangent of the HyperPoint.
+   */
+  tangent: IPoint;
+
+  /**
+   * The normalized vector representing the tangent of the HyperPoint.
+   */
+  normal: IPoint;
+
+  /**
+   * The spin defines the clockwise orientation of the HyperPoint and is assigned by the Attractor's locate operations.
+   * It affects mainly the direction of the tangent vector.
+   */
+  spin: number;
+
+  /**
+   * The polarity defines the inward/outward orientatation of the HyperPoint and is assigned by the Attractor's locate operations.
+   * It affects mainly the direction of the normal vector.
+   */
+  polarity: number;
+
+  handleIn: IPoint;
+  handleOut: IPoint;
+
+  /**
+   * Offsets the hyperpoint along a specified vector.
+   * @param {number} by - The distance to offset the hyperpoint.
+   * @param {string} along - The vector along which to offset the hyperpoint ('TAN', 'RAY', 'VER', 'HOR').
+   * @returns {HyperPoint} - The HyperPoint instance to allow for method chaining.
+   */
+
+  offsetBy(by: number, along: string): IHyperPoint;
+
+  /**
+   * Steers the hyperpoint by adjusting the handles.
+   * @param {number} tilt - The tilt angle to apply to the handles.
+   * @param {number} aperture - The aperture angle to apply to the handles.
+   * @returns {HyperPoint} - The HyperPoint instance.
+   */
+
+  steer(tilt: number, aperture?: number, hScale?: number): IHyperPoint;
+
+  /**
+   * Gets a segment object representing the hyperpoint.
+   * @param {BooleanLike} [withInHandle=true] - Specifies whether to include the in handle in the segment.
+   * @param {BooleanLike} [withOutHandle=true] - Specifies whether to include the out handle in the segment.
+   * @returns {Object} - The segment object representing the hyperpoint.
+   */
+
+  flip(): IHyperPoint;
+
+  clone(): IHyperPoint;
+}
+
+
 
 export interface IPoint {
   /**
@@ -290,94 +385,43 @@ export interface IPoint {
    */
 }
 
-/**
- * Represents a hyperpoint in a drawing.
- *
- * A hyperpoint is a point extracted from a curve that serves as a guide for drawing.
- * It encapsulates the position, tangent, normal, and handles of the point.
- * The hyperpoint is primarily defined at the moment of extraction from the curve.
- *
- * The HyperPoint class provides methods to manipulate and transform the point along its tangent or normal vector.
- * It also allows setting the spin or orientation of the curve, as well as retrieving a segment object for creating or adding to a Path object.
- *
- * By retaining the tangent, normal, and other properties of the hyperpoint, it remains closely related to the underlying curve, enabling consistent modifications and adjustments to the drawing.
- */
 
-export interface IHyperPoint {
-  /**
-   * x coordinate;
-   */
-  readonly x: number;
+export interface IPath {
 
-  /**
-   * y coordinate;
-   */
-  readonly y: number;
+  readonly length: number;
+  readonly size: SizeLike;
+  readonly center: PointLike;
 
-  /**
-   * xy representation of the HyperPoint;
-   */
-  readonly point: IPoint;
+  visibility: boolean;
+  position: PointLike;
+  pivot: IPoint;
+  strokeColor: paper.Color | null;
+  closed: boolean;
+  clone(): IPath;
+  segments: IHyperPoint[];
+  firstPoint: IHyperPoint;
+  lastPoint: IHyperPoint;
+  rotation: number;
+  add(...point: (IHyperPoint | PointLike | number[])[]): void;
+  insert(index: number, segment: PointLike): void;
+  getPointAt(offset: number): IPoint;
+  getLocationAt(offset: number): paper.CurveLocation;
+  scale(hor: number, ver: number, center?:PointLike): void;
+  rotate(angle: number, center?: PointLike): void;
+  reverse(): void;
+  remove(): void;
+  fullySelected: boolean;
+}
 
-  /**
-   * The position in the Attractor's path from where the HyperPoint was derived as a value between 0 and 1.
-   * It corresponds to value passed as the main parameter to AttractorObject.locate() or AttractorObject.anchorAt()
-   */
-  position: number;
+export interface IGroup {
 
-  /**
-   * The normalized vector representing the tangent of the HyperPoint.
-   */
-  tangent: IPoint | null;
+  readonly size: SizeLike;
 
-  /**
-   * The normalized vector representing the tangent of the HyperPoint.
-   */
-  normal: IPoint | null;
+  visibility: boolean;
+  position: PointLike;
+  pivot: IPoint;
 
-  /**
-   * The spin defines the orientation of the HyperPoint and is derived from the Orientation property of the Attractor from which it was derived.
-   * It affects mainly the direction of the tangent vector.
-   */
-  spin: number;
+  rotate(angle: number, center?: PointLike): void;
 
-  handleIn: IPoint;
-  handleOut: IPoint;
-
-  scaleHandles(
-    scale: number,
-    scaleIn?: BooleanLike,
-    scaleOut?: BooleanLike,
-  ): IHyperPoint;
-
-  /**
-   * Offsets the hyperpoint along a specified vector.
-   * @param {number} by - The distance to offset the hyperpoint.
-   * @param {string} along - The vector along which to offset the hyperpoint ('TAN', 'RAY', 'VER', 'HOR').
-   * @returns {HyperPoint} - The HyperPoint instance to allow for method chaining.
-   */
-
-  offsetBy(by: number, along: string): IHyperPoint;
-
-  /**
-   * Steers the hyperpoint by adjusting the handles.
-   * @param {number} tilt - The tilt angle to apply to the handles.
-   * @param {number} aperture - The aperture angle to apply to the handles.
-   * @returns {HyperPoint} - The HyperPoint instance.
-   */
-
-  steer(tilt: number, aperture?: number, hScale?: number): IHyperPoint;
-
-  /**
-   * Gets a segment object representing the hyperpoint.
-   * @param {BooleanLike} [withInHandle=true] - Specifies whether to include the in handle in the segment.
-   * @param {BooleanLike} [withOutHandle=true] - Specifies whether to include the out handle in the segment.
-   * @returns {Object} - The segment object representing the hyperpoint.
-   */
-
-  flip(): IHyperPoint;
-
-  getSegment(withInHandle?: BooleanLike, withOutHandle?: BooleanLike): any;
-
-  clone(): IHyperPoint;
+  remove(): void;
 }

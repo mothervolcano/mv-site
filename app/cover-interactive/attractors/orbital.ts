@@ -1,10 +1,7 @@
-import { Path, Group, Circle, Ellipse } from '../../lib/topo/drawing/paperjs';
+import { TopoPath, Group, Circle, Ellipse } from '../../lib/topo/drawing/paperjs';
 
-import { PathLocationData, OrientationType, PolarityType, PointLike, SizeLike, IHyperPoint } from '../../lib/topo/types';
-import { validateSizeInput} from '../../lib/topo/utils/converters'
-
+import { PathLocationData, PointLike, SizeLike, IHyperPoint} from '../../lib/topo/types';
 import AttractorObject from '../../lib/topo/core/attractorObject'
-import HyperPoint from '../../lib/topo/core/hyperPoint'
 
 
 class Orbital extends AttractorObject {
@@ -22,20 +19,18 @@ class Orbital extends AttractorObject {
 	// private _fixedOrientation: boolean;
 
 
-	constructor( radius: SizeLike | number, position: PointLike = {x:0, y:0} ) {
+	constructor( radius: SizeLike | number, position: IHyperPoint ) {
 
-		super( validateSizeInput(radius), position );
-
+		super( position );
 
 		this._radius =  typeof radius === 'number' ? radius : Array.isArray(radius) ? radius[0] : 'width' in radius ? radius.width : radius.x;
-
 		
 		/* DEBUG */
 
-		this._debugPath1 = new Path();
-		this._debugPath2 = new Path();
-		this._debugPath3 = new Path();
-		this._debugPath4 = new Path();
+		this._debugPath1 = new TopoPath();
+		this._debugPath2 = new TopoPath();
+		this._debugPath3 = new TopoPath();
+		this._debugPath4 = new TopoPath();
 
 		this._arrow = new Group();
 
@@ -65,7 +60,7 @@ class Orbital extends AttractorObject {
 
 	protected render() {
 
-		if ( this.isRendered ) {
+		if ( this.isRendered && this._content ) {
 
 			this._content.remove();
 			this.isRendered = false;
@@ -78,7 +73,7 @@ class Orbital extends AttractorObject {
 			// strokeColor: '#00A5E0'
 		})
 
-		this._path.visible = true;
+		this._path.visibility = true;
 
 		/* DEBUG */
 		// this.addOrientationArrow();
@@ -133,48 +128,53 @@ class Orbital extends AttractorObject {
 
 	protected getPathLocationDataAt( at: number ): PathLocationData {
 
+		if ( !this._path ) {
+
+			throw new Error(`ERROR @Orbital.getPathLocationDataAt(${at}) ! Path is missing`)
+		}
+
 		const loc = this._path.getLocationAt( this._path.length * at );
 
 		return { point: loc.point, tangent: loc.tangent, normal: loc.normal, curveLength: loc.curve.length, pathLength: loc.path.length, at: at };
 	};
 
 
-	private addOrientationArrow() {
+	// private addOrientationArrow() {
 
-		this._debugPath1.remove();
-		this._debugPath2.remove();
-		this._debugPath3.remove();
-		this._debugPath4.remove();
+	// 	this._debugPath1.remove();
+	// 	this._debugPath2.remove();
+	// 	this._debugPath3.remove();
+	// 	this._debugPath4.remove();
 
-		this._arrow.remove();
+	// 	this._arrow.remove();
 
-		this._arrow = new Group();
+	// 	this._arrow = new Group();
 
-		this._debugPath1 = new Path({ segments: [ this._path.segments[0], this._path.segments[1] ], strokeColor: '#70D9FF' });
+	// 	this._debugPath1 = new TopoPath({ segments: [ this._path.segments[0], this._path.segments[1] ], strokeColor: '#70D9FF' });
 		
-		let _A = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
-		let _Ar = _A.rotate( 30, this._debugPath1.lastSegment.point );
+	// 	let _A = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
+	// 	let _Ar = _A.rotate( 30, this._debugPath1.lastSegment.point );
 		
-		let _B = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
-		let _Br = _B.rotate( -40, this._debugPath1.lastSegment.point );
+	// 	let _B = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
+	// 	let _Br = _B.rotate( -40, this._debugPath1.lastSegment.point );
 
-		this._debugPath2 = new Path( {
-		                            segments: [ this._debugPath1.lastSegment.point, _Ar ],
-		                            strokeColor: '#70D9FF' });
+	// 	this._debugPath2 = new TopoPath( {
+	// 	                            segments: [ this._debugPath1.lastSegment.point, _Ar ],
+	// 	                            strokeColor: '#70D9FF' });
 		
-		this._debugPath3 = new Path( {
-		                            segments: [ this._debugPath1.lastSegment.point, _Br ],
-		                            strokeColor: '#70D9FF' });
+	// 	this._debugPath3 = new TopoPath( {
+	// 	                            segments: [ this._debugPath1.lastSegment.point, _Br ],
+	// 	                            strokeColor: '#70D9FF' });
 
-		this._debugPath4 = new Circle({center: this._debugPath1.firstSegment.point, radius: 2, fillColor: '#70D9FF'});
+	// 	this._debugPath4 = new Circle({center: this._debugPath1.firstSegment.point, radius: 2, fillColor: '#70D9FF'});
 	
 
-		this._arrow.addChild(this._debugPath1);
-		this._arrow.addChild(this._debugPath2);
-		this._arrow.addChild(this._debugPath3);
-		this._arrow.addChild(this._debugPath4);
+	// 	this._arrow.addChild(this._debugPath1);
+	// 	this._arrow.addChild(this._debugPath2);
+	// 	this._arrow.addChild(this._debugPath3);
+	// 	this._arrow.addChild(this._debugPath4);
 
-	}
+	// }
 
 	public reset() {
 

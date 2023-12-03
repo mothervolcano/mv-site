@@ -1,17 +1,12 @@
-import { Circle, Path, Point } from "../lib/topo/drawing/paperjs";
+import { TopoPath } from "../lib/topo/drawing/paperjs";
 
-import Orbital from "./attractors/orbital";
-import Spine from "./attractors/spine";
-import OrbitalField from "./attractors/orbitalField";
-import HyperPoint from "../lib/topo/core/hyperPoint";
-import SpinalField from "./attractors/spinalField";
-import { pull, retract, scaleHandles } from "../lib/topo/tools/stitcher";
 import { IPath } from "../lib/topo/types";
+import HyperPoint from "../lib/topo/core/hyperPoint";
 import { convertToSegment } from "../lib/topo/utils/converters";
-import { degToRad } from "../lib/topo/utils/helpers";
+import { pull, retract, scaleHandles } from "../lib/topo/tools/stitcher";
 
-const DEBUG_GREEN = "#10FF0C";
-const GUIDES = "#06E7EF";
+import Spine from "./attractors/spine";
+import SpinalField from "./attractors/spinalField";
 
 const MODES: any = {
 	SINE: "SINE",
@@ -52,6 +47,7 @@ export function createSineWave(
 	nf: number
 ) {
 	// ...
+
 	const baseline = new SpinalField(new HyperPoint(position), length, "ALTERNATED");
 
 	const amp = amplitude;
@@ -69,9 +65,22 @@ export function createSineWave(
 
 	const spines = [];
 
+	/* DEBUG ****************************/
+
+	// const ampFactor = envelopeAmp(10, nx, freq, nf);
+	// const testSpine1 = new Spine( 100, new HyperPoint({x: position.x-50, y: position.y + 150}))
+	// const testSpine2 = new Spine( 100, new HyperPoint({x: position.x+200, y: position.y + 150}))
+	// const testSpine3 = new Spine( 100, new HyperPoint({x: position.x+100, y: position.y + 70}))
+	
+	// baseline.addAttractor(testSpine1);
+	// baseline.addAttractor(testSpine2);
+	// baseline.addAttractor(testSpine3);
+
+	// ***************************************
+
 	for (let i = 0; i < freq; i++) {
 		const ampFactor = envelopeAmp(i, nx, freq, nf);
-		// console.log("ampFactor: ", ampFactor)
+		// console.log("ampFactor: ", Math.max(amp * ampFactor, 1));
 		const spine = new Spine(Math.max(amp * ampFactor, 1));
 		spines.push(spine);
 	}
@@ -88,7 +97,7 @@ export function createSineWave(
 	const waveColor = new paper.Color(lineColor);
 	waveColor.red = 1;
 
-	const path: IPath = new Path({
+	const path: IPath = new TopoPath({
 		strokeColor: waveColor,
 		// strokeWidth: lineWeight*(1-ny),
 		strokeWidth: lineWeight,
@@ -118,11 +127,11 @@ export function createSineWave(
 
 		if (mode === MODES.SQUARE) {
 			scaleHandles(hpts0[i], 0);
-			path.add(convertToSegment(hpts0[i]));
+			path.add(hpts0[i]);
 		}
 
 		if (currPt.point.x !== 0 && currPt.point.y !== 0) {
-			path.add(convertToSegment(currPt));
+			path.add(currPt);
 		}
 
 		prevPt = currPt;
@@ -140,8 +149,8 @@ export function createSineWave(
 		const B = baseline.attractor.locate(1)
 		retract(A)
 		retract(B)
-		path.insert(0,convertToSegment(A));
-		path.add(convertToSegment(B));
+		path.insert(0,A);
+		path.add(B);
 	}
 
 	// path.fullySelected = true;
@@ -153,7 +162,7 @@ export function createFlatLine(position: { x: number; y: number }, length: numbe
 	const A = line.locate(0);
 	const B = line.locate(1);
 
-	const path: IPath = new Path({
+	const path: IPath = new TopoPath({
 		segments: [convertToSegment(A), convertToSegment(B)],
 		strokeColor: lineColor,
 		// strokeWidth: lineWeight * (1-ny),
