@@ -7,7 +7,7 @@ import {
 } from "../styles/fonts";
 
 import Link from 'next/link';
-import Image from "next/image";
+// import NextImage from "next/image";
 
 import {
 	ActionIcon,
@@ -16,6 +16,7 @@ import {
 	Container,
 	Divider,
 	Flex,
+	Image,
 	Text,
 	Title,
 	rem,
@@ -24,12 +25,29 @@ import {
 	IconArrowUpRight,
 	IconChevronUpRight,
 	IconEye,
+	IconHourglassLow,
+	IconProgress
 } from "@tabler/icons-react";
 
-export default function ProjectCard(props: any) {
-	const { image, title, contrast, description, link } = props;
+const StatusIcon = (props: any) => {
 
-	const titleTypo = {
+	const { status, ...otherProps } = props;
+
+	switch ( status ) {
+	case "READY":
+		return (<IconEye {...otherProps}/>);
+	case "SOON":
+		return (<IconProgress {...otherProps}/>);
+	case "ONGOING":
+		return (<IconHourglassLow {...otherProps}/>)
+	default: return null
+	}
+}
+
+export default function ProjectCard(props: any) {
+	const { image, title, contrast, description, link, status } = props;
+
+	const titleStyle = {
 		color:
 			contrast === "DARK"
 				? "white"
@@ -59,7 +77,7 @@ export default function ProjectCard(props: any) {
 			<AspectRatio ratio={1 / 1.10}>
 				<Image
 					alt="Polka Folks project thumbnail image"
-					src={image}
+					src={`${image}`}
 				/>
 				<Flex
 					direction="column"
@@ -67,7 +85,7 @@ export default function ProjectCard(props: any) {
 					justify="space-between"
 					align="flex-start"
 				>
-					<Title style={titleTypo} order={2}>
+					<Title style={titleStyle} order={2}>
 						{title}
 					</Title>
 					<Flex direction="column" align="flex-end" p={0}>
@@ -78,10 +96,10 @@ export default function ProjectCard(props: any) {
 							// onClick={(event) => {event.preventDefault(); console.log("open: ", event.currentTarget.href)}}
 							variant="filled"
 							size="xl"
-							color="black"
+							color={contrast==="DARK" ? "white" : "black"}
 							radius={0}
 						>
-							<IconArrowUpRight stroke={1} />
+							<StatusIcon status={status} stroke={1} color={contrast==="DARK" ? "black" : "white"}/>
 						</ActionIcon>
 						<Container bg="white" p={0}>
 							<Divider size="xs" color="black" />

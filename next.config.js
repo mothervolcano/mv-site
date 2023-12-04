@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	output: "export",
+	// output: "export",
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "mothervolcano.com",
+				port: "",
+				pathname: "/cartesio/**",
+			},
+		],
+	},
 
 	// Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
 	// trailingSlash: true,

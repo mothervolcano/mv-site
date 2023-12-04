@@ -20,13 +20,25 @@ import ProjectCard from "./components/ProjectCard";
 import Logo from "./components/logo";
 
 import { useMediaQuery } from "@mantine/hooks";
-import { Button, Container, Flex, Card, Image, Title, Text, AspectRatio, rem, Divider, Space } from "@mantine/core";
+import { Button, Container, Flex, Card, Title, Text, AspectRatio, rem, Divider, Space } from "@mantine/core";
 
-import thumbPolkaFolks from "../public/img/project_thumb_polka.png";
-import thumbFass from "../public/img/project_thumb_fass.png";
-import thumbFassPlugin from "../public/img/project_thumb_fass_plugin.png";
-import thumbArborator from "../public/img/project_thumb_arborator.png";
-import thumbPolystar from "../public/img/project_thumb_polystar.png";
+// import thumbPolkaFolks from "../public/img/project_thumb_polka.png";
+// import thumbHilbert from "../public/img/project_thumb_hilbert.png";
+// import thumbOscill from "../public/img/project_thumb_oscill.png";
+// import thumbArborator from "../public/img/project_thumb_arborator.png";
+// import thumbPolystar from "../public/img/project_thumb_polystar.png";
+
+// const thumbPolystar = "https://mothervolcano.com/cartesio/project_thumb_polystar.png"
+// const thumbHilbert = "https://mothervolcano.com/cartesio/project_thumb_hilbert.png"
+// const thumbPolkaFolks = "https://mothervolcano.com/cartesio/project_thumb_polka.png"
+// const thumbOscill = "https://mothervolcano.com/cartesio/project_thumb_oscill.png"
+// const thumbArborator = "https://mothervolcano.com/cartesio/project_thumb_arborator.png"
+
+const thumbPolystar = "/img/project_thumb_polystar.png"
+const thumbHilbert = "/img/project_thumb_hilbert.png"
+const thumbPolkaFolks = "/img/project_thumb_polka.png"
+const thumbOscill = "/img/project_thumb_oscill.png"
+const thumbArborator = "/img/project_thumb_arborator.png"
 
 import { init, resize, update, generate } from "./cover-interactive/main";
 
@@ -36,7 +48,32 @@ const projectsData = [
     description: `One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.`,
     image: thumbPolkaFolks,
     constrat: "LIGHT",
-    link: ""
+    link: "",
+    status: "SOON"
+  },
+  {
+    title: "Hilbert",
+    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
+    image: thumbHilbert,
+    contrast: "DARK",
+    link: "https://mothervolcano.github.io/hilbert-demo/",
+    status: "READY"
+  },
+  {
+    title: "Polystar",
+    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    image: thumbPolystar,
+    contrast: "LIGHT",
+    link: "https://mothervolcano.github.io/polystar-demo/",
+    status: "READY"
+  },
+  {
+    title: "Oscill",
+    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    image: thumbOscill,
+    contrast: "DARK",
+    link: "",
+    status: "ONGOING"
   },
 
   {
@@ -44,31 +81,8 @@ const projectsData = [
     description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
     image: thumbArborator,
     contrast: "DARK",
-    link: ""
-  },
-
-  {
-    title: "Hilbert",
-    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
-    image: thumbFass,
-    contrast: "DARK",
-    link: "https://mothervolcano.github.io/hilbert-demo/"
-  },
-
-  {
-    title: "Polystar",
-    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
-    image: thumbPolystar,
-    contrast: "LIGHT",
-    link: "https://mothervolcano.github.io/polystar-demo/"
-  },
-
-  {
-    title: "Oscill",
-    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
-    image: thumbFassPlugin,
-    contrast: "LIGHT",
-    link: ""
+    link: "",
+    status: "ONGOING"
   },
 ];
 
@@ -174,7 +188,7 @@ export default function Home() {
 
           <div className={styles.projects}>
             {projectsData.map((p) => (
-              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link}/>
+              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link} status={p.status}/>
             ))}
           </div>
         </div>
