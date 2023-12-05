@@ -116,7 +116,7 @@ export default function Home() {
     if (paperLoaded && canvasSize) {
       
       const margin = isLandscape ? 0.25 : 0.75;
-      const density = isLandscape ? 50 : 10;
+      const density = isLandscape ? 50 : 7;
 
       init(margin, density);
       generate();

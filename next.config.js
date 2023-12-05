@@ -7,7 +7,7 @@ const nextConfig = {
 				protocol: "https",
 				hostname: "mothervolcano.com",
 				port: "",
-				pathname: "/cartesio/**",
+				pathname: "/img/**",
 			},
 		],
 	},
