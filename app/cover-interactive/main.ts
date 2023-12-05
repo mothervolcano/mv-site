@@ -12,7 +12,7 @@ let view: any;
 let layer: any;
 let origin: any;
 
-let rowNum: number;
+let num: number;
 let step: number;
 const effectRadius = 200;
 const baseFreq = 16;
@@ -47,23 +47,17 @@ class Plot {
 		this.length = length;
 		this.frequency = baseFreq;
 		this.visible = false;
-		this.color = new paper.Color(1, 0.65, 0.65);
+		this.color = new paper.Color(0.3, 0.3, 0.3);
 		this.compression = 0;
 	}
 }
 
 // ----------------------------------------------------------------------
-// HELPERS
+// AUX
 
 function proximitySensor(position: { x: number; y: number }, origin: any, radius: number) {
-	// ...
-	// const p = new Point(position);
-	// const o = new Point(origin);
-
-	// const d = p.getDistance(o);
 
 	const d = origin.y - position.y;
-
 	return d < radius && d > -radius;
 }
 
@@ -73,22 +67,8 @@ function calculateAmplitude(position: { x: number; y: number }, origin: any, rad
 	return (radius - Math.abs(d)) * 0.3;
 }
 
-function calculateFrequency(position: { x: number; y: number }, origin: any, radius: number) {
-	const d = origin.y - position.y;
+// ----------------------------------------------------------------------
 
-	return Math.sin((Math.abs(d) / radius) * degToRad(180));
-}
-
-// function calculateFrequency(p: PlotType, i: number, n: number, range: number) {
-//     for (let offset = -range; offset <= range; offset++) {
-//         if (offset === 0) continue; // Skip the current index
-
-//         let neighborIndex = i + offset;
-//         if (neighborIndex >= 0 && neighborIndex < grid.length) {
-//             grid[neighborIndex].frequency = p.frequency - n;
-//         }
-//     }
-// }
 
 export function init(margin: number, density: number) {
 	// ...
@@ -102,8 +82,8 @@ export function init(margin: number, density: number) {
 		layer.position = view.center;
 	};
 
-	rowNum = density;
-	step = degToRad(90 / rowNum);
+	num = density;
+	step = degToRad(90 / num);
 
 	// view.onFrame = () => {
 
@@ -179,12 +159,14 @@ export function generate() {
 		// const color = new paper.Color(n.color);
 		// color.alpha = 1-Math.max(i, rowNum/2)/rowNum;
 
-		const ny = i / rowNum;
+		const ny = i / num;
 		const nf = n.frequency / baseFreq;
 
-		const nextColor = new paper.Color(n.color);
-		nextColor.green = i / rowNum;
-		n.color = nextColor;
+		// const nextColor = new paper.Color(n.color);
+		// nextColor.green = i / num;
+		// n.color = nextColor;
+
+		n.color.alpha = 1 - i/num;
 
 		// const amp = calculateAmplitude(n.position, origin, effectRadius) * Math.cos(step * i) * 1.25;
 		const amp = calculateAmplitude(n.position, origin, effectRadius) * Math.abs(time) * 2;
@@ -209,6 +191,9 @@ export function generate() {
 	});
 }
 
+// -----------------------------------------------------------------
+// DEBUG
+
 export function _generate() {
 	const i = 15;
 
@@ -216,11 +201,11 @@ export function _generate() {
 
 	const nx = origin.x / view.size.width;
 
-	const ny = i / rowNum;
+	const ny = i / num;
 	const nf = n.frequency / baseFreq;
 
 	const nextColor = new paper.Color(n.color);
-	nextColor.green = i / rowNum;
+	nextColor.green = i / num;
 	n.color = nextColor;
 
 	// const amp = calculateAmplitude(n.position, origin, effectRadius) * 2;

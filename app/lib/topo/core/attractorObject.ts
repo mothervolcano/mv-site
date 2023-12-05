@@ -169,7 +169,6 @@ abstract class AttractorObject extends DisplayObject {
 				if (!anchor.normal) {
 					throw new Error("Attractor anchor missing normal vector");
 				}
-				console.log("rotation", this._path)
 				// this._content.rotation = anchor.normal.angle;
 				this._path.rotation = anchor.normal.angle;
 			}

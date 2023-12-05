@@ -42,12 +42,16 @@ const thumbArborator = "/img/project_thumb_arborator.png"
 
 import { init, resize, update, generate } from "./cover-interactive/main";
 
+const COLORS_DARK = "#212121";
+const COLORS_LIGHT = "#FFFFFF";
+
 const projectsData = [
   {
     title: "Polka Folks",
     description: `One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.`,
     image: thumbPolkaFolks,
-    constrat: "LIGHT",
+    contrast: "LIGHT",
+    colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
     status: "SOON"
   },
@@ -56,6 +60,7 @@ const projectsData = [
     description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
     image: thumbHilbert,
     contrast: "DARK",
+    colors: [COLORS_LIGHT, COLORS_DARK],
     link: "https://mothervolcano.github.io/hilbert-demo/",
     status: "READY"
   },
@@ -64,6 +69,7 @@ const projectsData = [
     description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
     image: thumbPolystar,
     contrast: "LIGHT",
+    colors: [COLORS_LIGHT, COLORS_DARK],
     link: "https://mothervolcano.github.io/polystar-demo/",
     status: "READY"
   },
@@ -72,6 +78,7 @@ const projectsData = [
     description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
     image: thumbOscill,
     contrast: "DARK",
+    colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
     status: "ONGOING"
   },
@@ -81,6 +88,7 @@ const projectsData = [
     description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
     image: thumbArborator,
     contrast: "DARK",
+    colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
     status: "ONGOING"
   },
@@ -106,10 +114,9 @@ export default function Home() {
 
   useEffect(() => {
     if (paperLoaded && canvasSize) {
-      console.log(`! resize paper view to: width: ${canvasSize.width} height: ${canvasSize.height}`);
       
-      const margin = isLandscape ? 0.25 : 0.50;
-      const density = isLandscape ? 50 : 20;
+      const margin = isLandscape ? 0.25 : 0.75;
+      const density = isLandscape ? 50 : 10;
 
       init(margin, density);
       generate();
@@ -186,7 +193,7 @@ export default function Home() {
 
           <div className={styles.projects}>
             {projectsData.map((p) => (
-              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link} status={p.status}/>
+              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link} status={p.status} colors={p.colors}/>
             ))}
           </div>
         </div>

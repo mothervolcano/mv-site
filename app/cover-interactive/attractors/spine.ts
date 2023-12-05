@@ -11,7 +11,7 @@ function isHyperPoint(value: any): value is IHyperPoint {
 }
 
 class Spine extends AttractorObject {
-	private DEBUG_MODE: boolean = true;
+	private DEBUG_MODE: boolean = false;
 
 	private _A: any;
 	private _B: any;

@@ -2,9 +2,9 @@
 .container {
     width: 100%;
     height: 100vh;
-    border-top: 1px black solid;
+/*    border-top: 1px black solid;
     border-left: 1px black solid;
-    border-bottom: 1px black solid;
+    border-bottom: 1px black solid;*/
     background-color: #ffffff;
     display: grid;
     gap: 0px;
@@ -138,20 +138,24 @@
     }
 
     .logo {
-        left: 0.75rem;
+        left: 1rem;
         top: 1.1rem;
         width: 5rem;
         height: 5rem;
     }
 
+    .intro {
+        padding-left: 30%;
+    }
+
     .title {
-        font-size: 2.25rem;
-        line-height: 2.4rem;
+        font-size: 2rem;
+        line-height: 2.15rem;
     }
 
     .introText {
-        font-size: 0.9rem;
-        line-height: 1.15rem;
+        font-size: 0.80rem;
+        line-height: 1.10rem;
     }
 }
 
@@ -159,7 +163,7 @@
     .stage {
         position: relative;
         width: 100%;
-        height: 10vh;
+        height: 20vh;
     }
 
     .logo {

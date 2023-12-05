@@ -1,9 +1,7 @@
 import {
-	camptonLight,
 	camptonBook,
 	camptonMedium,
-	camptonSemiBold,
-	camptonBold,
+	camptonSemiBold
 } from "../styles/fonts";
 
 import Link from 'next/link';
@@ -12,7 +10,6 @@ import Link from 'next/link';
 import {
 	ActionIcon,
 	AspectRatio,
-	Button,
 	Container,
 	Divider,
 	Flex,
@@ -22,11 +19,10 @@ import {
 	rem,
 } from "@mantine/core";
 import {
-	IconArrowUpRight,
-	IconChevronUpRight,
+
 	IconEye,
 	IconHourglassLow,
-	IconProgress
+	IconSettings
 } from "@tabler/icons-react";
 
 const StatusIcon = (props: any) => {
@@ -37,15 +33,15 @@ const StatusIcon = (props: any) => {
 	case "READY":
 		return (<IconEye {...otherProps}/>);
 	case "SOON":
-		return (<IconProgress {...otherProps}/>);
+		return (<IconHourglassLow {...otherProps}/>);
 	case "ONGOING":
-		return (<IconHourglassLow {...otherProps}/>)
+		return (<IconSettings {...otherProps}/>)
 	default: return null
 	}
 }
 
 export default function ProjectCard(props: any) {
-	const { image, title, contrast, description, link, status } = props;
+	const { image, title, contrast, description, link, status, colors } = props;
 
 	const titleStyle = {
 		color:
@@ -54,10 +50,10 @@ export default function ProjectCard(props: any) {
 				: contrast === "LIGHT"
 				? "black"
 				: "black",
-		fontFamily: camptonMedium.style.fontFamily,
+		fontFamily: contrast === "DARK" ? camptonMedium.style.fontFamily : camptonSemiBold.style.fontFamily,
 		fontSize: "2rem",
-		marginLeft: "1rem",
-		marginTop: "0.70rem",
+		// marginLeft: "1rem",
+		// marginTop: "0.70rem",
 	};
 
 	const bodyTypography = {
@@ -85,7 +81,7 @@ export default function ProjectCard(props: any) {
 					justify="space-between"
 					align="flex-start"
 				>
-					<Title style={titleStyle} order={2}>
+					<Title style={titleStyle} order={2} pt="0.30rem" pl="1rem">
 						{title}
 					</Title>
 					<Flex direction="column" align="flex-end" p={0}>
@@ -99,11 +95,11 @@ export default function ProjectCard(props: any) {
 							color={contrast==="DARK" ? "white" : "black"}
 							radius={0}
 						>
-							<StatusIcon status={status} stroke={1} color={contrast==="DARK" ? "black" : "white"}/>
+							<StatusIcon status={status} stroke={1} size={32} color={contrast==="DARK" ? "black" : "white"}/>
 						</ActionIcon>
-						<Container bg="white" p={0}>
+						<Container bg={colors[0]} p={0}>
 							<Divider size="xs" color="black" />
-							<Text style={bodyTypography} size="0.90rem" lh="1.09rem" p={10}>
+							<Text style={bodyTypography} size="0.90rem" lh="1.09rem" p={10} c={colors[1]}>
 								{description}
 							</Text>
 						</Container>

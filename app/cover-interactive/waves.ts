@@ -95,7 +95,7 @@ export function createSineWave(
 	// ------------------------------------------------
 
 	const waveColor = new paper.Color(lineColor);
-	waveColor.red = 1;
+	// waveColor.red = 1;
 
 	const path: IPath = new TopoPath({
 		strokeColor: waveColor,

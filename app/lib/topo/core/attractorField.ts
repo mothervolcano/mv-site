@@ -117,8 +117,6 @@ abstract class AttractorField extends DisplayNode {
 			throw new Error("AttractorField has no base attractor");
 		}
 
-		console.log('arrange attractors')
-
 		const start = this._span[0];
 		const end = this._span[1];
 
