@@ -172,7 +172,6 @@ export default function Home() {
               }}
             />
               <Logo className={styles.logo} />
-              <Flex style={{ position: "absolute", zIndex: "100" }} direction="row" justify="flex-end" align={ isPortrait ? "flex-start" : "flex-end" } h="100%" pt="0">
                 <div className={styles.intro}>
                   <h1 style={{fontFamily: isPortrait ? camptonBold.style.fontFamily : camptonSemiBold.style.fontFamily}} className={styles.title}>
                     Introduction Title
@@ -182,8 +181,7 @@ export default function Home() {
                     into a horrible vermin. He lay on his armour-like back, and if he lifted his head a little he could
                     see his brown belly, slightly domed and divided by arches into stiff sections. <a href="https://mothervolcano.github.io/polystar-demo/">Click me</a>
                   </div>
-                </div>
-              </Flex>
+              </div>
           </div>
 
           <div className={styles.projects}>
