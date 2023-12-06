@@ -7,20 +7,29 @@ import { useEffect, useRef, useState } from "react";
 
 // import Image from "next/image";
 import styles from "./page.module.css";
-import {
-  camptonLight,
-  camptonBook,
-  camptonMedium,
-  camptonSemiBold,
-  camptonBold,
-} from "./styles/fonts";
+import { camptonLight, camptonBook, camptonMedium, camptonSemiBold, camptonBold } from "./styles/fonts";
 
 import PaperStage from "./components/paperStage";
 import ProjectCard from "./components/ProjectCard";
 import Logo from "./components/logo";
 
+import { IconBrandGithub, IconBrandLinkedin } from "@tabler/icons-react";
+
 import { useMediaQuery } from "@mantine/hooks";
-import { Button, Container, Flex, Card, Title, Text, AspectRatio, rem, Divider, Space } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Flex,
+  Card,
+  Title,
+  Text,
+  AspectRatio,
+  rem,
+  Divider,
+  Space,
+  ActionIcon,
+  Group,
+} from "@mantine/core";
 
 // import thumbPolkaFolks from "../public/img/project_thumb_polka.png";
 // import thumbHilbert from "../public/img/project_thumb_hilbert.png";
@@ -34,11 +43,11 @@ import { Button, Container, Flex, Card, Title, Text, AspectRatio, rem, Divider, 
 // const thumbOscill = "https://mothervolcano.com/cartesio/project_thumb_oscill.png"
 // const thumbArborator = "https://mothervolcano.com/cartesio/project_thumb_arborator.png"
 
-const thumbPolystar = "/img/project_thumb_polystar.png"
-const thumbHilbert = "/img/project_thumb_hilbert.png"
-const thumbPolkaFolks = "/img/project_thumb_polka.png"
-const thumbOscill = "/img/project_thumb_oscill.png"
-const thumbArborator = "/img/project_thumb_arborator.png"
+const thumbPolystar = "/img/project_thumb_polystar.png";
+const thumbHilbert = "/img/project_thumb_hilbert.png";
+const thumbPolkaFolks = "/img/project_thumb_polka.png";
+const thumbOscill = "/img/project_thumb_oscill.png";
+const thumbArborator = "/img/project_thumb_arborator.png";
 
 import { init, resize, update, generate } from "./cover-interactive/main";
 
@@ -48,49 +57,58 @@ const COLORS_LIGHT = "#FFFFFF";
 const projectsData = [
   {
     title: "Polka Folks",
-    description: `One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.`,
+    description:
+      "Pursuing algorithmic life-like variation with whimsical little characters. Testing ground project from a new vector drawing framework.",
     image: thumbPolkaFolks,
     contrast: "LIGHT",
     colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
-    status: "SOON"
+    textLinks: [],
+    status: "SOON",
   },
   {
     title: "Hilbert",
-    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
+    description:
+      "A FASS curve generator based on Hilbert’s model. FASS is the short way of saying: space-filling, self-avoiding, simple and self-similar curve. Soon available as a plugin.",
     image: thumbHilbert,
     contrast: "DARK",
     colors: [COLORS_LIGHT, COLORS_DARK],
     link: "https://mothervolcano.github.io/hilbert-demo/",
-    status: "READY"
+    textLinks: [],
+    status: "READY",
   },
   {
     title: "Polystar",
-    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    description: "A shape creation tool, based on a simple yet versatile model. Soon available as a plugin.",
     image: thumbPolystar,
     contrast: "LIGHT",
     colors: [COLORS_LIGHT, COLORS_DARK],
     link: "https://mothervolcano.github.io/polystar-demo/",
-    status: "READY"
+    textLinks: [],
+    status: "READY",
   },
   {
     title: "Oscill",
-    description: `It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather.`,
+    description:
+      "A waveform generator that can be used to modulate lines, curves and shapes. Soon available as a plugin.",
     image: thumbOscill,
     contrast: "DARK",
     colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
-    status: "ONGOING"
+    textLinks: [],
+    status: "ONGOING",
   },
 
   {
     title: "Arborator",
-    description: `"How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position.`,
+    description:
+      "Arborator is a proof-of-concept project testing a new procedural generation framework based on the Lindenmayer System, or L-System. Follow on",
     image: thumbArborator,
     contrast: "DARK",
     colors: [COLORS_LIGHT, COLORS_DARK],
     link: "",
-    status: "ONGOING"
+    textLinks: ["https://github.com/mothervolcano/arborator", "GitHub"],
+    status: "ONGOING",
   },
 ];
 
@@ -108,13 +126,11 @@ export default function Home() {
   const isLandscape = useMediaQuery("(orientation: landscape)");
   const isPortrait = useMediaQuery("(orientation: portrait)");
 
-
   // ---------------------------------------------
   // HOOKS
 
   useEffect(() => {
     if (paperLoaded && canvasSize) {
-      
       const margin = isLandscape ? 0.25 : 0.75;
       const density = isLandscape ? 50 : 7;
 
@@ -178,22 +194,40 @@ export default function Home() {
                 setPaperLoaded(true);
               }}
             />
-              <Logo className={styles.logo} />
-                <div className={styles.intro}>
-                  <h1 style={{fontFamily: isPortrait ? camptonBold.style.fontFamily : camptonSemiBold.style.fontFamily}} className={styles.title}>
-                    Introduction Title
-                  </h1>
-                  <div className={styles.introText}>
-                    One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed
-                    into a horrible vermin. He lay on his armour-like back, and if he lifted his head a little he could
-                    see his brown belly, slightly domed and divided by arches into stiff sections. <a href="https://mothervolcano.github.io/polystar-demo/">Click me</a>
-                  </div>
+            <Logo className={styles.logo} />
+            <div className={styles.intro}>
+              <div className={styles.title}>
+                <h1
+                  style={{ fontFamily: isPortrait ? camptonBold.style.fontFamily : camptonSemiBold.style.fontFamily }}
+                >
+                  Eduardo Barbosa
+                </h1>
+                <ActionIcon component="a" href="https://www.linkedin.com/in/eduardobarbosa/" target="_blank" variant="filled" color="#212121" size="1.45rem" radius="sm">
+                  <IconBrandLinkedin size={24} stroke={1.5} />
+                </ActionIcon>
+                <ActionIcon component="a" href="https://github.com/mothervolcano" target="_blank" variant="filled" color="#212121" size="1.45rem" radius="xl">
+                  <IconBrandGithub size={16} stroke={1.5} />
+                </ActionIcon>
               </div>
+              <div className={styles.introText}>
+                Based in Porto, I'm  a former designer and illustrator, now a JavaScript developer passionate about generative visuals, data and interaction.
+              </div>
+            </div>
           </div>
 
           <div className={styles.projects}>
             {projectsData.map((p) => (
-              <ProjectCard key={p.title} title={p.title} contrast={p.contrast} image={p.image} description={p.description} link={p.link} status={p.status} colors={p.colors}/>
+              <ProjectCard
+                key={p.title}
+                title={p.title}
+                contrast={p.contrast}
+                image={p.image}
+                description={p.description}
+                link={p.link}
+                textLinks={p.textLinks}
+                status={p.status}
+                colors={p.colors}
+              />
             ))}
           </div>
         </div>

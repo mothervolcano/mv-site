@@ -9,6 +9,7 @@ import Link from 'next/link';
 
 import {
 	ActionIcon,
+	Anchor,
 	AspectRatio,
 	Container,
 	Divider,
@@ -19,7 +20,6 @@ import {
 	rem,
 } from "@mantine/core";
 import {
-
 	IconEye,
 	IconHourglassLow,
 	IconSettings
@@ -41,7 +41,7 @@ const StatusIcon = (props: any) => {
 }
 
 export default function ProjectCard(props: any) {
-	const { image, title, contrast, description, link, status, colors } = props;
+	const { image, title, contrast, description, link, textLinks, status, colors } = props;
 
 	const titleStyle = {
 		color:
@@ -81,7 +81,7 @@ export default function ProjectCard(props: any) {
 					justify="space-between"
 					align="flex-start"
 				>
-					<Title style={titleStyle} order={2} pt="0.30rem" pl="1rem">
+					<Title style={titleStyle} order={2} pt="0.45rem" pl="1rem">
 						{title}
 					</Title>
 					<Flex direction="column" align="flex-end" p={0}>
@@ -99,8 +99,8 @@ export default function ProjectCard(props: any) {
 						</ActionIcon>
 						<Container bg={colors[0]} p={0}>
 							<Divider size="xs" color="black" />
-							<Text style={bodyTypography} size="0.90rem" lh="1.09rem" p={10} c={colors[1]}>
-								{description}
+							<Text style={bodyTypography} size="0.95rem" lh="1.25rem" pl="0.75rem" pr="0.25rem" pt="0.50rem" pb="1rem" c={colors[1]}>
+								{description}{textLinks[0] && (<><Anchor>{` ${textLinks[1]}`}</Anchor>.</>)}
 							</Text>
 						</Container>
 					</Flex>
