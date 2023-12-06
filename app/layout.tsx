@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import "@radix-ui/themes/styles.css";
 import '@mantine/core/styles.css';
 
-import { MantineProvider, ColorSchemeScript } from '@mantine/core';
-import { theme } from '../theme';
+import { ColorSchemeScript } from '@mantine/core';
 
 export const metadata: Metadata = {
   title: "Mother Volcano",
@@ -22,7 +21,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        {children}
       </body>
     </html>
   );

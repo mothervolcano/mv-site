@@ -17,19 +17,20 @@ import { IconBrandGithub, IconBrandLinkedin } from "@tabler/icons-react";
 
 import { useMediaQuery } from "@mantine/hooks";
 import {
-  Button,
-  Container,
-  Flex,
-  Card,
-  Title,
-  Text,
-  AspectRatio,
-  rem,
-  Divider,
-  Space,
   ActionIcon,
-  Group,
+  createTheme,
+  MantineProvider,
 } from "@mantine/core";
+
+const theme = createTheme({
+  components: {
+    ActionIcon: ActionIcon.extend({
+      vars: (theme, props) => {
+        return { root: {'--ai-hover': props.color}}
+      }
+    })
+  }
+})
 
 // import thumbPolkaFolks from "../public/img/project_thumb_polka.png";
 // import thumbHilbert from "../public/img/project_thumb_hilbert.png";
@@ -179,7 +180,7 @@ export default function Home() {
   // }
 
   return (
-    <>
+    <MantineProvider theme={theme}>
       {true ? (
         <div className={styles.container}>
           <div className={styles.cover}>
@@ -209,7 +210,7 @@ export default function Home() {
                   <IconBrandGithub size={16} stroke={1.5} />
                 </ActionIcon>
               </div>
-              <div className={styles.introText}>
+              <div className={styles.introText} style={{ fontFamily: camptonBook.style.fontFamily }}>
                 Based in Porto, I'm  a former designer and illustrator, now a JavaScript developer passionate about generative visuals, data and interaction.
               </div>
             </div>
@@ -234,6 +235,6 @@ export default function Home() {
       ) : (
         <div>loading...</div>
       )}
-    </>
+    </MantineProvider>
   );
 }
