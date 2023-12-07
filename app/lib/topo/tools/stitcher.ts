@@ -25,7 +25,7 @@ export function merge(hpt1: any, hpt2: any) {
 	return hpt;
 }
 
-export function pull(hpt: any, length: number) {
+export function pull(hpt: IHyperPoint, length: number) {
 	hpt.handleIn.length = length;
 	hpt.handleOut.length = length;
 }
