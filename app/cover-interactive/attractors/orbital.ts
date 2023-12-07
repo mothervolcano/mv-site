@@ -1,10 +1,10 @@
 import { TopoPath, Group, Circle, Ellipse } from '../../lib/topo/drawing/paperjs';
 
 import { PathLocationData, PointLike, SizeLike, IHyperPoint} from '../../lib/topo/types';
-import AttractorObject from '../../lib/topo/core/attractorObject'
+import AttractorTopo from '../../lib/topo/core/attractorTopo'
 
 
-class Orbital extends AttractorObject {
+class Orbital extends AttractorTopo {
 
 	
 	private _debugPath1: any;
