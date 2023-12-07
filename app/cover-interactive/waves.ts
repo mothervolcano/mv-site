@@ -1,6 +1,6 @@
 import { TopoPath } from "../lib/topo/drawing/paperjs";
 
-import { IPath } from "../lib/topo/types";
+import { IAttractor, IPath } from "../lib/topo/types";
 import HyperPoint from "../lib/topo/core/hyperPoint";
 import { convertToSegment } from "../lib/topo/utils/converters";
 import { pull, retract, scaleHandles } from "../lib/topo/tools/stitcher";
@@ -48,7 +48,7 @@ export function createSineWave(
 ) {
 	// ...
 
-	const baseline = new SpinalField(new HyperPoint(position), length, "ALTERNATED");
+	const baseline = new SpinalField(length, new HyperPoint(position), "ALTERNATED");
 
 	const amp = amplitude;
 	const freq = Math.max(frequency, 2);
@@ -81,15 +81,15 @@ export function createSineWave(
 	for (let i = 0; i < freq; i++) {
 		const ampFactor = envelopeAmp(i, nx, freq, nf);
 		// console.log("ampFactor: ", Math.max(amp * ampFactor, 1));
-		const spine = new Spine(Math.max(amp * ampFactor, 1));
+		const spine = new Spine(Math.max(amp * ampFactor, 1), new HyperPoint({x:0, y:0}));
 		spines.push(spine);
 	}
 
 	baseline.addAttractors(spines);
 
-	if ( compression > 0 ) {
-		baseline.compress(compressionStart, compressionEnd);
-	}
+	// if ( compression > 0 ) {
+	// 	baseline.compress(compressionStart, compressionEnd);
+	// }
 
 
 	// ------------------------------------------------
@@ -145,8 +145,8 @@ export function createSineWave(
 
 	if (compression > 0) {
 
-		const A = baseline.attractor.locate(0);
-		const B = baseline.attractor.locate(1)
+		const A = baseline.locateOnSelf(0);
+		const B = baseline.locateOnSelf(1)
 		retract(A)
 		retract(B)
 		path.insert(0,A);
@@ -170,4 +170,34 @@ export function createFlatLine(position: { x: number; y: number }, length: numbe
 	});
 
 	return path;
+}
+
+export function testWave(position: { x: number; y: number } ) {
+
+	console.log('................................')
+	console.log('TESTING TOPO!')
+
+	const field = new SpinalField(200, new HyperPoint(position), "ALTERNATED");
+	const spine1 = new Spine(100, new HyperPoint({x: position.x, y: position.y -50}));
+	const spine2 = new Spine(100, new HyperPoint({x: position.x, y: position.y -100}));
+	const spine3 = new Spine(100, new HyperPoint({x: position.x, y: position.y -150}));
+	const spine4 = new Spine(100, new HyperPoint({x: position.x, y: position.y -150}));
+	const spine5 = new Spine(100, new HyperPoint({x: position.x, y: position.y -150}));
+
+	// field.addAttractor(spine1);
+	// field.addAttractor(spine2);
+	// field.addAttractor(spine3);
+	// field.addAttractor(spine4);
+	// field.addAttractor(spine5);
+
+	field.addAttractors([spine1, spine2, spine3, spine4, spine5])
+
+	const pts = field.locate(1);
+
+	for ( const pt of pts ) {
+
+		new paper.Path.Circle({center: pt.point, radius: 5, fillColor: 'red'})
+	}
+
+
 }
