@@ -76,13 +76,14 @@ export function init(margin: number, density: number) {
 	view = paper.project.view;
 	origin = view.center;
 	layer = new paper.Layer();
-	grid = createGrid(view.size.width, view.size.height, margin, density);
+	// num = density;
+	num = 75;
+	grid = createGrid(view.size.width, view.size.height, margin, num);
 	view.onResize = () => {
 		console.log("!!! Paper view resized!");
 		layer.position = view.center;
 	};
 
-	num = density;
 	step = degToRad(90 / num);
 
 	// view.onFrame = () => {
