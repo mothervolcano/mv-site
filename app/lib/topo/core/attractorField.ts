@@ -1,128 +1,75 @@
-import {
-	OrientationType,
-	PolarityType,
-	IAttractor,
-	IHyperPoint,
-	VectorDirection,
-	PointLike,
-	SizeLike,
-    IPath,
-} from "../types";
-
-import DisplayNode from "./displayNode";
+import { IAttractor, IAttractorField, IHyperPoint, IPath, VectorDirection } from "../types";
 import AttractorObject from "./attractorObject";
 
-abstract class AttractorField extends DisplayNode {
-	protected _attractor: IAttractor | undefined;
+abstract class AttractorField extends AttractorObject {
+	private _attractors: IAttractor[] = [];
 
-	private _span: Array<number>;
-	private _shift: number;
+	//--------------------------------
+	// PROPERTIES
 
-	private _axisAngle: number;
+	private _span: [number, number] = [0, 1];
+	private _shift: number = 0;
 
-	public isDisabled: boolean;
-	public isSelfAnchored: boolean;
-	public isAxisLocked: boolean;
+	constructor(topo: IPath, anchor?: IHyperPoint) {
+		super(topo, anchor);
 
-	constructor(position: PointLike, size?: SizeLike) {
-		super(position, size);
-
-		this._axisAngle = 0;
-
-		this._span = [0, 1];
-		this._shift = 0;
-
-		this.isDisabled = false;
-		this.isAxisLocked = false;
-		this.isSelfAnchored = false;
+		return this;
 	}
 
-	get attractor() {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
+	public addAttractor(att: IAttractor, at?: number): IAttractor {
+		this._attractors.push(att);
+
+		att.setField(this);
+		att.configureAttractor();
+	
+		if (at && typeof at === "number") {
+			const anchor = this.locateOnSelf(at);
+
+			att.setSelfAnchored(true);
+			att.anchorAt(anchor);
+		} else {
+			this.update();
 		}
 
-		return this._attractor;
+		return att;
 	}
 
-	get anchor() {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
+	public addAttractors(attractors: IAttractor[]): void {
+		this._attractors = [...this._attractors, ...attractors.map( (att) => {
+			att.setField(this);
+			att.configureAttractor();
+			return att;
+		})];
 
-		return this._attractor?.anchor;
+		this.update();
 	}
 
-	get attractors() {
-		return this.getChildren();
-	}
-
-	get firstAttractor() {
-		return this.getFirstChild();
-	}
-
-	get lastAttractor() {
-		return this.getLastChild();
-	}
-
-	set orientation(value: OrientationType) {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-
-		this._attractor.orientation = value;
-	}
-
-	get orientation() {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-
-		return this._attractor.orientation;
-	}
-
-	set polarity(value: PolarityType) {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-		this._attractor.polarity = value;
-	}
-
-	get polarity() {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-		return this._attractor.polarity;
-	}
-
-	set axisAngle(value: number) {
-		this._axisAngle = value;
-	}
-
-	get axisAngle() {
-		return this._axisAngle;
-	}
-
-	// MUST BE IMPLEMENTED BY THE SUBCLASSES
-	protected configureAttractor(att: IAttractor, anchor: IHyperPoint) {}
-
-	protected filterAttractors() {
-		const attractors = this.getChildren().filter((att) => !att.isDisabled && !att.isSelfAnchored);
-
+	filterAttractors() {
+		const attractors = this._attractors.filter((att) => !att.selfAnchored);
 		return attractors;
 	}
 
-	protected arrangeAttractors(attractors: Array<IAttractor>, pTest: boolean = false) {
-		if (!this._attractor || !this._attractor.path) {
-			throw new Error("AttractorField has no base attractor");
+	update() {
+
+		if (this.field) { // is it anchored on parent field?
+
+			this.adjustToPosition();
+			this.adjustToSpin();
+			this.adjustToPolarity();
+
+			this.rotate(this.axisAngle);
+			this.topo.placeAt(this.anchor.point, this.topo.position);
 		}
 
+
+		const attractors = this.filterAttractors();
+		
 		const start = this._span[0];
 		const end = this._span[1];
 
 		const span = end - start;
 
-		let len = !this._attractor.path.closed || pTest ? attractors.length - 1 : attractors.length;
+		let len = !this.topo.closed ? attractors.length - 1 : attractors.length;
 
 		const step = span / Math.max(len, 1);
 
@@ -134,246 +81,82 @@ abstract class AttractorField extends DisplayNode {
 					? this._shift + start + step * i - 1
 					: this._shift + start + step * i;
 
-			const anchor = attractor.isSelfAnchored
-				? this._attractor.locate(attractor.anchor.position)
-				: this._attractor.locate(position);
+			const anchor = attractor.selfAnchored
+				? this.locateOnSelf(attractor.anchor.position)
+				: this.locateOnSelf(position);
 
-			attractor.reset();
-
-			this.configureAttractor(attractor, anchor);
-
-			attractor.anchorAt(anchor)
+			this.configureAttractor();
+			attractor.update();
+			attractor.anchorAt(anchor);
 		}
 	}
 
-	public getAttractor(i?: number): any {
-		if (typeof i === "number") {
-			return this.getChild(i);
-		} else {
-			return this._attractor!;
-		}
+	getAttractor(i: number): IAttractor {
+		return this._attractors[i];
 	}
 
-	public locate(at: number, orient: boolean = false): IHyperPoint[] {
+	anchorAt(anchor: IHyperPoint, along: VectorDirection = "RAY"): void {
+		if (!this.topo) {
+			throw new Error(`ERROR @AttractorTopo.anchorAt(...): path is missing!`);
+		}
+
+		this.setAnchor(anchor);
+		this.anchor.spin = this.spin;
+
+		if (!this.axisLocked) {
+			if (along === "TAN") {
+				if (!anchor.tangent) {
+					throw new Error("Attractor anchor missing tangent vector");
+				}
+
+				// this._content.rotation = anchor.tangent.angle;
+				this.topo.rotation = anchor.tangent.angle;
+			} else {
+				if (!anchor.normal) {
+					throw new Error("Attractor anchor missing normal vector");
+				}
+				// this._content.rotation = anchor.normal.angle;
+				this.topo.rotation = anchor.normal.angle;
+			}
+		}
+
+		this.update();
+	}
+
+
+	locate(at: number, orient: boolean = false): IHyperPoint[] {
 		const attractors = this.filterAttractors();
-		const anchors = attractors.filter((att) => !att.isToSkip).map((att) => att.locate(at, orient));
+		const anchors = attractors.filter((att) => !att.skip).map((att) => att.locate(at, orient));
 
 		// return _.flatten( anchors );
 		return anchors.flat();
 	}
 
-	// -------------------------------------------------------
-	// locate on a specified attractor
-
-	public locateOn(attractor: IAttractor | number, at: number, orient: boolean = false) {
-		if (attractor instanceof AttractorObject) {
-			return attractor.locate(at);
-		} else if (typeof attractor === "number") {
-			return this.getChild(attractor).locate(at, orient);
-		}
+	locateOn(iAttractor: number, at: number, orient: boolean = false): IHyperPoint {
+		return this.getAttractor(iAttractor).locate(at, orient);
 	}
 
-	public addAttractor(attractor: IAttractor, at?: number): void {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
+	locateOnSelf(at: number, orient: boolean = false) {
+		const locationData = this.getTopoLocationAt(at);
 
-		console.log('add attractor')
+		if (locationData) {
+			const pt = this.createAnchor(locationData);
 
-		this.add(attractor);
-
-		// if ( attractor._dimension === null )  { attractor._dimension = this.getChildren().length }
-
-		// ------------------------------------------------------------
-		//
-
-		if (typeof at === "number") {
-			const anchor = this._attractor.locate(at);
-
-			attractor.reset();
-			attractor.isSelfAnchored = true;
-
-			this.configureAttractor(attractor, anchor);
-			attractor.anchorAt(anchor);
-
-			// ------------------------------------------------------------
-			//
-		} else {
-			this.arrangeAttractors(this.filterAttractors());
-		}
-	}
-
-	public addAttractors(attractors: IAttractor[]) {
-		this.addMany(attractors);
-
-		this.arrangeAttractors(attractors);
-	}
-
-	public anchorAt(anchor: IHyperPoint, along: VectorDirection = "RAY") {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-
-		this._attractor.anchorAt(anchor, along);
-
-		this.arrangeAttractors(this.filterAttractors());
-	}
-
-	public placeAt(position: any, pivot: any): void {
-		// const iPos = this.position;
-
-		super.placeAt(position, pivot);
-
-		this.arrangeAttractors(this.filterAttractors());
-
-		// for ( const att of this.getChildren() ) {
-
-		// 	const pos = att.position.add( this.position.subtract(iPos) )
-
-		// 	att.placeAt( pos )
-		// }
-	}
-
-	public moveBy(by: number, along: any) {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-
-		this._attractor.anchor.offsetBy(by, along);
-
-		this.placeAt(this._attractor.anchor.point, null);
-
-		return this;
-	}
-
-	public scale(hor: number, ver: number, scaleField: boolean = false): any {
-		if (scaleField) {
-			// TODO
-		} else {
-			for (const att of this.filterAttractors()) {
-				att.scale(hor, ver);
-				att.rotate(att.anchor.normal.angle);
+			if (orient && this.spin === -1) {
+				return pt.flip();
 			}
-		}
 
-		return this;
-	}
-
-	// Rotates the node together with its childs
-
-	public rotate(angle: number) {
-		if (!this._attractor) {
-			throw new Error("Attractor Field has no defined base attractor");
-		}
-
-		// if ( !this._attractor.isAxisLocked ) {
-
-		// 	this._attractor._content.rotate( angle, this._attractor._anchor.point );
-		// 	this._attractor.axisAngle += angle;
-		// }
-
-		this._attractor.rotate(angle);
-
-		// const group = new Group();
-
-		// group.addChild( this._content );
-
-		// for ( const att of this.getChildren() ) {
-
-		// 	group.addChild( att._content )
-		// }
-
-		// group.pivot = this._content.position;
-
-		// group.rotate( angle )
-	}
-
-	// Rotates the childs around the node
-
-	public revolve(angle: number) {
-		const delta = angle; // TODO angles need to be normalized to 0... 1
-
-		this._shift = delta;
-
-		this.arrangeAttractors(this.filterAttractors());
-
-		return this;
-	}
-
-	public spin(angle: number) {
-		for (const att of this.filterAttractors()) {
-			att.rotate(angle);
-		}
-
-		return this;
-	}
-
-	public fold(amount: any, alignAxis: boolean = true) {
-		// const start = this._span[0];
-		// const end = this._span[1];
-
-		const start = this._span[0];
-		const end = this._span[1];
-
-		let factor = this.filterAttractors().length === 2 ? 3 : this.filterAttractors().length === 3 ? 2 : 1.5;
-
-		if (amount >= 0) {
-			this._span = [start + amount, end - amount * factor];
+			return pt;
 		} else {
-			this._span = [end + amount, start - amount * factor];
-		}
-
-		const attractors = this.filterAttractors().map((att) => {
-			att.isAxisLocked = !alignAxis;
-			return att;
-		});
-
-		this.arrangeAttractors(attractors, true);
-
-		return this;
-	}
-
-	public compress(start: any, end: any, alignAxis: boolean = true) {
-		this._span = [start, end];
-
-		const attractors = this.filterAttractors().map((att) => {
-			att.isAxisLocked = !alignAxis;
-			return att;
-		});
-
-		this.arrangeAttractors(attractors, true);
-
-		return this;
-	}
-
-	public expandBy(by: any, along: string) {
-		for (const att of this.filterAttractors()) {
-			att.moveBy(by, along);
-		}
-
-		return this;
-	}
-
-	protected render(item: IPath) {
-		super.render(item);
-	}
-
-	public reset(): void {
-		for (const att of this.getChildren()) {
-			att.reset();
-		}
-
-		if (this._attractor) {
-			this._attractor.reset();
+			throw new Error(`! ERROR @AttractorTopo.locate() : Unable to locate at ${at}`);
 		}
 	}
 
-	public remove(): void {
-		if (this._attractor) {
-			this._attractor.remove();
-		}
-		super.remove();
+	rotate(angle: number) {
+
 	}
+
+	remove() {}
 }
 
 export default AttractorField;
