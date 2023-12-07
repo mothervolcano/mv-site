@@ -1,3 +1,5 @@
+import AttractorField from "./core/attractorField";
+
 export type OrientationType = -1 | 1;
 export type PolarityType = -1 | 1;
 
@@ -26,7 +28,7 @@ export type RectangleLike =
   | { x: number; y: number; width: number; height: number }
   | { from: PointLike; to: PointLike };
 
-export interface PathLocationData {
+export interface TopoLocationData {
   point: IPoint;
   tangent: IPoint;
   normal: IPoint;
@@ -35,64 +37,54 @@ export interface PathLocationData {
   at: number;
 }
 
-export interface IDisplayObject {
-  position: any;
-  size: any;
-  remove(): void;
-  placeAt(position: any, anchor: any): void;
-  moveBy(vector: any, distance: number): void;
+export interface IAttractor {
+
+  topo: IPath;
+  field: any;
+  anchor: IHyperPoint;
+  spin: number;
+  polarity: number;
+  axisAngle: number;
+  axisLocked: boolean;
+  selfAnchored: boolean;
+  skip: boolean;
+  setField(aAttractorField: any): void;
+  setAnchor(aAnchor: IHyperPoint): void;
+  setAxisAngle(angle: number): void;
+  setSelfAnchored(value: boolean): void;
+  setAxisLocked(value: boolean): void;
+  setSkip(value: boolean): void;
+  setOrientationDeterminator(fn: Function);
+  setSpinDeterminator(fn: Function);
+  setPolarityDeterminator(fn: Function);
+
+  anchorAt(aAnchor: IHyperPoint, along?: VectorDirection ): void
+  update(): void;
+  adjustToPosition():void;
+  adjustToSpin():void;
+  adjustToPolarity():void;
+  getTopoLocationAt(at: number): TopoLocationData;
+  addAttractor(aAttractor: IAttractor, at?: number): IAttractor;
+  getAttractor(i: number): IAttractor;
+  locate(at: number, orient?: boolean): IHyperPoint;
+  rotate(angle: number): void
+  configureAttractor(): void;
 }
 
-export interface IAttractor extends DisplayObjectType {
-  readonly anchor: IHyperPoint;
-  isDisabled: boolean;
-  isAxisLocked: boolean;
-  isSelfAnchored: boolean;
-  orientation: OrientationType;
-  polarity: PolarityType;
-  path: IPath | null;
-  anchorAt(anchor: IHyperPoint, along?: VectorDirection): void;
-  locate(at: number, orient?: boolean): IHyperPoint | never;
-  adjustRotationToPosition(
-    anchor: IHyperPoint,
-    isPositive: Function,
-    isNegative: Function,
-  ): void;
-  adjustToOrientation(
-    anchor: IHyperPoint,
-    isPositive: Function,
-    isNegative: Function,
-  ): void;
-  adjustToPolarity(anchor: IHyperPoint): void;
-  rotate(angle: number): void;
-  reset(): void;
-  remove(): void;
+export interface IAttractorTopo extends IAttractor {
+
+  
 }
 
-export interface IAttractorField {
-  readonly attractor: IAttractor & IAttractorObject;
-  readonly attractors: Array<IAttractor>;
-  readonly firstAttractor: IAttractor;
-  readonly lastAttractor: IAttractor;
+export interface IAttractorField extends IAttractor {
 
-  addAttractor(attractor: IAttractor, at?: number): void;
-  addAttractors(attractors: Array<IAttractor>);
-  getAttractor(i?: number): IAttractor;
-  locateOn(
-    attractor: IAttractor | number,
-    at: number,
-    orient: boolean,
-  ): IHyperpoint;
-}
-
-export interface IAttractorObject {
-  center: IHyperPoint;
-  length: number;
-  path: any;
-  getPath(): any;
-  extractPath(A: IHyperPoint | number, B: IHyperPoint | number): any;
-  rotate(angle: number): void;
-  remove(): void;
+  setOrientationDeterminator(fn: Function);
+  setSpinDeterminator(fn: Function);
+  setPolarityDeterminator(fn: Function);
+  configureField(): void;
+  filterAttractors(): IAttractor[];
+  locateOn(iAttractor: number, at: number, orient?: boolean ): IHyperPoint;
+  locateOn(iAttractor: number, at: number, orient: boolean = false): IHyperPoint
 }
 
 export interface IOrbital {
@@ -386,7 +378,14 @@ export interface IPoint {
 }
 
 
-export interface IPath {
+export interface IDisplayObject {
+  position: any;
+  size: any;
+  remove(): void;
+  placeAt(position: any, anchor: any): void;
+}
+
+export interface IPath extends IDisplayObject {
 
   readonly length: number;
   readonly size: SizeLike;

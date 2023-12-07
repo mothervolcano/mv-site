@@ -43,6 +43,9 @@ function convertToPaperSegment(pt: PointLike): paper.Segment | paper.Point {
         const hIn = pt.handleIn || null;
         const hOut = pt.handleOut || null;
 
+        // console.log("1 IS HYPERPOINT ", hIn)
+        // console.log("2 IS HYPERPOINT ", new paper.Segment(pt.point, hIn, hOut))
+
         return new paper.Segment(pt.point, hIn, hOut);
     } else {
         return new paper.Point(pt);
@@ -138,21 +141,27 @@ export class Segment {
     }
 }
 
-export class TopoPath {
+export class TopoPath extends DisplayObject {
     private _Path: paper.Path;
 
     constructor(...args: any[]) {
         if (args.length === 0) {
             const paperPath = new paper.Path();
             // super(paperPath.position);
+            super(paperPath.position);
+            this.render(paperPath);
             this._Path = paperPath;
         } else if (args.length === 1 && typeof args[0] === "object") {
             const paperPath = new paper.Path(args[0]);
             // super(paperPath.position, paperPath.bounds.size);
+            super(paperPath.position);
+            this.render(paperPath);
             this._Path = paperPath;
         } else {
             const paperPath = new paper.Path(...args);
             // super(paperPath.position, paperPath.bounds.size);
+            super(paperPath.position);
+            this.render(paperPath);
             this._Path = paperPath;
         }
     }
@@ -231,7 +240,17 @@ export class TopoPath {
         return convertToHyperPoint(this._Path.lastSegment);
     }
 
+    public addPoint( pt: IHyperPoint ) {
+
+        const sgm = convertToPaperSegment(pt)
+
+        // console.log("adding point: ", pt.handleOut)
+
+        this._Path.add( sgm );
+    }
+
     public add(...point: (IHyperPoint | PointLike | number[])[]) {
+
         this._Path.add(...point);
     }
 
@@ -263,11 +282,15 @@ export class TopoPath {
         this._Path.rotate(angle, center);
     }
 
-    public clone(): IPath {
+    public clone(): TopoPath {
         // return this._Path.clone();
         const clonedPath = new TopoPath(this._Path.segments);
         clonedPath.strokeColor = this._Path.strokeColor;
         return clonedPath;
+    }
+
+    public reset(): void {
+        this._Path.removeSegments();
     }
 
     public remove() {

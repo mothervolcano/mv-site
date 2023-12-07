@@ -3,7 +3,7 @@ declare const paper: any;
 import { IPath } from "../lib/topo/types";
 import { degToRad } from "../lib/topo/utils/helpers";
 
-import { setStyle, createSineWave, createFlatLine } from "./waves";
+import { setStyle, createSineWave, createFlatLine,testWave } from "./waves";
 
 // ------------------------------------------------------------------------
 // MODULE GLOBALS
@@ -214,6 +214,8 @@ export function _generate() {
 	if (proximitySensor(n.position, origin, effectRadius)) {
 		setStyle({ color: n.color });
 		createSineWave(n.position, n.length / 2, n.frequency, amp, n.compression, nx, ny, nf);
+
+		// testWave(n.position);
 
 		// n.color = nextColor;
 	}
