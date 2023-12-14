@@ -1,44 +1,42 @@
-import { TopoPath, Group, Circle, Ellipse } from '../../lib/topo/drawing/paperjs';
+import { Path, Group } from 'paper';
 
-import { PathLocationData, PointLike, SizeLike, IHyperPoint} from '../../lib/topo/types';
-import AttractorTopo from '../../lib/topo/core/attractorTopo'
+import { PathLocationData, UnitIntervalNumber, IHyperPoint, PointLike, SizeLike } from '../../lib/topo/types';
+import { validateSizeInput} from '../../lib/topo/utils/converters'
+
+import AttractorObject from '../../lib/topo/core/attractorObject'
+import HyperPoint from '../../lib/topo/core/hyperPoint'
 
 
-class Orbital extends AttractorTopo {
+class Orbital extends AttractorObject {
 
 	
-	private _debugPath1: any;
-	private _debugPath2: any;
-	private _debugPath3: any;
-	private _debugPath4: any;
-	private _arrow: any;
-
-
-	private _radius: number;
+	// private _debugPath1: any;
+	// private _debugPath2: any;
+	// private _debugPath3: any;
+	// private _debugPath4: any;
+	// private _arrow: any;
 
 	// private _fixedOrientation: boolean;
 
 
-	constructor( radius: SizeLike | number, position: IHyperPoint ) {
+	constructor( radius: SizeLike | number, position: PointLike = {x:0, y:0}, orientation?: number ) {
 
-		super( position );
+		super( validateSizeInput(radius), position );
 
-		this._radius =  typeof radius === 'number' ? radius : Array.isArray(radius) ? radius[0] : 'width' in radius ? radius.width : radius.x;
-		
-		/* DEBUG */
+		this.radius = Array.isArray(radius) ? radius[0] : radius;
 
-		this._debugPath1 = new TopoPath();
-		this._debugPath2 = new TopoPath();
-		this._debugPath3 = new TopoPath();
-		this._debugPath4 = new TopoPath();
+		// this._debugPath1 = new Path();
+		// this._debugPath2 = new Path();
+		// this._debugPath3 = new Path();
+		// this._debugPath4 = new Path();
 
-		this._arrow = new Group();
+		// this._arrow = new Group();
 
 		this.render();
 
 		
 		// TODO: review this. The idea was to define the orientation permanently and prevent it from being reset by fields
-		// if (orientation) this.adjustToOrientation( orientation );
+		if (orientation) this.adjustToOrientation( orientation );
 
 		// this._fixedOrientation = false;
 
@@ -50,88 +48,67 @@ class Orbital extends AttractorTopo {
 
 		return this;
 
-	};
-
-	get radius() {
-
-		return this._radius;
 	}
 
 
 	protected render() {
 
-		if ( this.isRendered && this._content ) {
+		if ( this.isRendered ) {
 
 			this._content.remove();
 			this.isRendered = false;
 		}	
 
-		this._path = new Ellipse({
+		this._path = new Path.Ellipse({
 
 			center: this.position,
 			radius: this.size,
-			// strokeColor: '#00A5E0'
+			strokeColor: '#00A5E0'
 		})
-
-		this._path.visibility = true;
 
 		/* DEBUG */
 		// this.addOrientationArrow();
 
 		// super.render( new Group( [ this._path, this._arrow ] ) );
-		super.render(this._path)
+		super.render( this._path );
 
 	};
 
+	protected adjustRotationToPosition( position: number ) {
 
-	public adjustRotationToPosition( anchor: IHyperPoint,  isPositive: Function, isNegative: Function ) {
-	
-		if ( isPositive( anchor.position ) ) {
+		if ( position > 0.25 && position < 0.75 ) {
 
-			this.axisAngle = -180;
-
-		} else  if ( isNegative( anchor.position ) ) {
-
-			this.axisAngle = 0;
+			return 0;
 
 		} else {
 
-			throw new Error( 'POSSIBLY TRYING TO ANCHOR OUTSIDE OF FIELDs BOUNDS' );
+			return -180;
 		}
 	};
 
 
-	public adjustToOrientation( anchor: IHyperPoint,  isPositive: Function, isNegative: Function  ) {
+	public adjustToOrientation( anchor: any ) {
 
-		if ( isPositive( anchor.position ) ) {
-
-			this.scale( 1, 1 );
-			this.orientation = 1;
-
-		} else  if ( isNegative( anchor.position ) ) {
+		if ( anchor.position > 0.25 && anchor.position < 0.75 ) {
 
 			this.scale( -1, 1 );
 			this.orientation = -1;
 
 		} else {
 
-			throw new Error( 'POSSIBLY TRYING TO ANCHOR OUTSIDE OF FIELDs BOUNDS' );
+			this.scale( 1, 1 );
+			this.orientation = 1;
 		}
 	};
 
 
-	public adjustToPolarity( anchor: IHyperPoint ) {
+	protected adjustToPolarity( anchor: any ) {
 
 		// this.scale( 1, value );
 	};
 
 
 	protected getPathLocationDataAt( at: number ): PathLocationData {
-
-		if ( !this._path ) {
-
-			throw new Error(`ERROR @Orbital.getPathLocationDataAt(${at}) ! Path is missing`)
-		}
 
 		const loc = this._path.getLocationAt( this._path.length * at );
 
@@ -150,7 +127,7 @@ class Orbital extends AttractorTopo {
 
 	// 	this._arrow = new Group();
 
-	// 	this._debugPath1 = new TopoPath({ segments: [ this._path.segments[0], this._path.segments[1] ], strokeColor: '#70D9FF' });
+	// 	this._debugPath1 = new Path({ segments: [ this._path.segments[0], this._path.segments[1] ], strokeColor: '#70D9FF' });
 		
 	// 	let _A = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
 	// 	let _Ar = _A.rotate( 30, this._debugPath1.lastSegment.point );
@@ -158,15 +135,15 @@ class Orbital extends AttractorTopo {
 	// 	let _B = this._debugPath1.lastSegment.point.subtract( this._debugPath1.lastSegment.location.tangent.multiply(5) );
 	// 	let _Br = _B.rotate( -40, this._debugPath1.lastSegment.point );
 
-	// 	this._debugPath2 = new TopoPath( {
+	// 	this._debugPath2 = new Path( {
 	// 	                            segments: [ this._debugPath1.lastSegment.point, _Ar ],
 	// 	                            strokeColor: '#70D9FF' });
 		
-	// 	this._debugPath3 = new TopoPath( {
+	// 	this._debugPath3 = new Path( {
 	// 	                            segments: [ this._debugPath1.lastSegment.point, _Br ],
 	// 	                            strokeColor: '#70D9FF' });
 
-	// 	this._debugPath4 = new Circle({center: this._debugPath1.firstSegment.point, radius: 2, fillColor: '#70D9FF'});
+	// 	this._debugPath4 = new Path.Circle({center: this._debugPath1.firstSegment.point, radius: 2, fillColor: '#70D9FF'});
 	
 
 	// 	this._arrow.addChild(this._debugPath1);

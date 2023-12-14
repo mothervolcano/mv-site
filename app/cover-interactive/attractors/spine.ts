@@ -109,4 +109,3 @@ class Spine extends AttractorTopo {
 }
 
 export default Spine;
-
