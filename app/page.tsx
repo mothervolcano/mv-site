@@ -32,18 +32,6 @@ const theme = createTheme({
   }
 })
 
-// import thumbPolkaFolks from "../public/img/project_thumb_polka.png";
-// import thumbHilbert from "../public/img/project_thumb_hilbert.png";
-// import thumbOscill from "../public/img/project_thumb_oscill.png";
-// import thumbArborator from "../public/img/project_thumb_arborator.png";
-// import thumbPolystar from "../public/img/project_thumb_polystar.png";
-
-// const thumbPolystar = "https://mothervolcano.com/cartesio/project_thumb_polystar.png"
-// const thumbHilbert = "https://mothervolcano.com/cartesio/project_thumb_hilbert.png"
-// const thumbPolkaFolks = "https://mothervolcano.com/cartesio/project_thumb_polka.png"
-// const thumbOscill = "https://mothervolcano.com/cartesio/project_thumb_oscill.png"
-// const thumbArborator = "https://mothervolcano.com/cartesio/project_thumb_arborator.png"
-
 const thumbPolystar = "/img/project_thumb_polystar.png";
 const thumbHilbert = "/img/project_thumb_hilbert.png";
 const thumbPolkaFolks = "/img/project_thumb_polka.png";
@@ -211,7 +199,7 @@ export default function Home() {
                 </ActionIcon>
               </div>
               <div className={styles.introText} style={{ fontFamily: camptonBook.style.fontFamily }}>
-                Based in Porto, I'm  a former designer and illustrator, now a JavaScript developer passionate about generative visuals, data and interaction.
+                Porto-based JavaScript developer. Ex-designer. Generative visuals, interaction, and data: the Venn diagram where I'm building my expertise.
               </div>
             </div>
           </div>

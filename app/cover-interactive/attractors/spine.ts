@@ -44,8 +44,6 @@ class Spine extends AttractorTopo {
 
 	adjustToPosition() {
 
-		console.log('5 adjusting spine: ', this.anchor.position)
-
 		if (this.determineOrientation(this.anchor.position)) {
 			this.setAxisAngle(0);
 		} else if (!this.determineOrientation(this.anchor.position)) {
