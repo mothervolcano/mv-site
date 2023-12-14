@@ -1,14 +1,14 @@
-import AttractorTopo from "@/app/lib/topo/core/attractorTopo";
-import HyperPoint from "@/app/lib/topo/core/hyperPoint";
-import { TopoPath } from "@/app/lib/topo/drawing/paperjs";
-import { IHyperPoint, IPath, IPoint, TopoLocationData } from "@/app/lib/topo/types";
+import { TopoLocationData, TopoPoint as TopoPointType } from "../../lib/topo/topo";
+import HyperPoint from "../../lib/topo/core/hyperPoint";
+import AttractorTopo from "../../lib/topo/core/attractorTopo";
+import { TopoPoint, TopoPath } from "../../lib/topo/drawing/paperjs";
 
 
 class Spine extends AttractorTopo {
 
-	constructor(length: number, anchor?: IHyperPoint ) {
+	constructor(length: number, anchor: HyperPoint = new HyperPoint([0,0]) ) {
 
-		const topoPath: IPath = new TopoPath()
+		const topoPath: TopoPath = new TopoPath()
 
 		// console.log('SPINE: ', topoPath)
 
@@ -17,17 +17,16 @@ class Spine extends AttractorTopo {
 		this.draw();
 	}
 
-	draw() {
+	protected draw() {
 
 		if (this.anchor) {
 
 			this.topo.reset();
-			const A: IPoint = this.anchor.point.subtract([this.length/2, 0]);
-			const B: IPoint = this.anchor.point.add([this.length/2, 0]);
+			const A: TopoPointType = this.anchor.point.subtract([this.length/2, 0]);
+			const B: TopoPointType = this.anchor.point.add([this.length/2, 0]);
 			this.topo.add(A,B);
 
 			this.topo.visibility = false;
-
 			// this.topo.strokeColor = new paper.Color("blue");
 		}
 	}
@@ -42,7 +41,7 @@ class Spine extends AttractorTopo {
 		}
 	}
 
-	adjustToPosition() {
+	protected adjustToPosition() {
 
 		if (this.determineOrientation(this.anchor.position)) {
 			this.setAxisAngle(0);
@@ -53,7 +52,7 @@ class Spine extends AttractorTopo {
 		}
 	}
 
-	adjustToSpin() {
+	protected adjustToSpin() {
 		if (this.determineSpin(this.anchor.position)) {
 			this.setSpin(1);
 		} else if (!this.determineSpin(this.anchor.position)) {
@@ -63,13 +62,15 @@ class Spine extends AttractorTopo {
 		}
 	}
 
-	adjustToPolarity() {
+	protected adjustToPolarity() {
 		// TODO
 		this.setPolarity(1);
 	}
 
 	// at is provided by attractors that have paths that are non-linear ie. the input location doesn't match the mapped location.
-	createAnchor({ point, tangent, normal, curveLength, pathLength, at }: TopoLocationData): IHyperPoint {
+	createAnchor(locationData: TopoLocationData): HyperPoint {
+		const { point, tangent, normal, curveLength, pathLength, at } = locationData;
+
 		const factor = [0, 0.25, 0.5, 0.75].includes(at) ? 1 / 3 : curveLength / pathLength;
 
 		const hIn = tangent.multiply(curveLength * factor).multiply(-1);
@@ -78,15 +79,15 @@ class Spine extends AttractorTopo {
 		const anchor = new HyperPoint(point, hIn, hOut);
 
 		anchor.position = at;
-		anchor.tangent = tangent.multiply(this.spin); // HACK: because the path is flipped using scale() the vectors need to be inverted
-		anchor.normal = normal.multiply(this.spin);
+		anchor.setTangent( new TopoPoint(tangent.multiply(this.spin)) ); // HACK: because the path is flipped using scale() the vectors need to be inverted
+		anchor.setNormal( new TopoPoint(normal.multiply(this.spin)) );
 		anchor.spin = this.spin;
 		anchor.polarity = this.polarity;
 
 		return anchor;
 	}
 
-	getTopoLocationAt(at: number): TopoLocationData {
+	protected getTopoLocationAt(at: number): TopoLocationData {
 
 		if ( !this.topo ) {
 
@@ -96,11 +97,7 @@ class Spine extends AttractorTopo {
 		const loc = this.topo.getLocationAt(this.topo.length * at);
 
 		return {
-			point: loc.point,
-			tangent: loc.tangent,
-			normal: loc.normal,
-			curveLength: loc.curve.length,
-			pathLength: loc.path.length,
+			...loc,
 			at: at,
 		};
 	}

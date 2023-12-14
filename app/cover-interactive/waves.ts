@@ -1,6 +1,5 @@
 import { TopoPath } from "../lib/topo/drawing/paperjs";
 
-import { IAttractor, IPath } from "../lib/topo/types";
 import HyperPoint from "../lib/topo/core/hyperPoint";
 import { convertToSegment } from "../lib/topo/utils/converters";
 import { pull, retract, scaleHandles } from "../lib/topo/tools/stitcher";
@@ -97,7 +96,7 @@ export function createSineWave(
 	const waveColor = new paper.Color(lineColor);
 	// waveColor.red = 1;
 
-	const path: IPath = new TopoPath({
+	const path: TopoPath = new TopoPath({
 		strokeColor: waveColor,
 		// strokeWidth: lineWeight*(1-ny),
 		strokeWidth: lineWeight,
@@ -125,10 +124,10 @@ export function createSineWave(
 			currPt.steer(90 * currPt.polarity).flip();
 		}
 
-		if (mode === MODES.SQUARE) {
-			scaleHandles(hpts0[i], 0);
-			path.add(hpts0[i]);
-		}
+		// if (mode === MODES.SQUARE) {
+		// 	scaleHandles(hpts0[i], 0);
+		// 	path.add(hpts0[i]);
+		// }
 
 		if (currPt.point.x !== 0 && currPt.point.y !== 0) {
 			path.add(currPt);
@@ -156,13 +155,13 @@ export function createSineWave(
 	// path.fullySelected = true;
 }
 
-export function createFlatLine(position: { x: number; y: number }, length: number, ny: number): IPath {
+export function createFlatLine(position: { x: number; y: number }, length: number, ny: number): TopoPath {
 	const line = new Spine(length, new HyperPoint(position));
 
 	const A = line.locate(0);
 	const B = line.locate(1);
 
-	const path: IPath = new TopoPath({
+	const path: TopoPath = new TopoPath({
 		segments: [convertToSegment(A), convertToSegment(B)],
 		strokeColor: lineColor,
 		// strokeWidth: lineWeight * (1-ny),

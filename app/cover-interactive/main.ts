@@ -1,6 +1,6 @@
 declare const paper: any;
 
-import { IPath } from "../lib/topo/types";
+import { TopoPath } from "../lib/topo/topo";
 import { degToRad } from "../lib/topo/utils/helpers";
 
 import { setStyle, createSineWave, createFlatLine,testWave } from "./waves";
@@ -145,7 +145,7 @@ export function generate() {
 	const nx = origin.x / view.size.width;
 	// const ix = Math.floor(freq * x);
 
-	const flatLine: IPath = createFlatLine({ x: 0, y: 0 }, view.size.width, 1);
+	const flatLine: TopoPath = createFlatLine({ x: 0, y: 0 }, view.size.width, 1);
 	flatLine.visibility = false;
 
 	// for ( const p of grid ) {

@@ -1,9 +1,9 @@
+import { HyperPoint, TopoPoint, TopoLocationData, VectorDirection } from "../topo";
 import { TopoPath } from "../drawing/paperjs";
-import { IHyperPoint, IPath, IPoint, TopoLocationData, VectorDirection } from "../types";
 import AttractorObject from "./attractorObject";
 
 abstract class AttractorTopo extends AttractorObject {
-	constructor(aTopo: IPath, anchor?: IHyperPoint) {
+	constructor(aTopo: TopoPath, anchor?: HyperPoint) {
 		super(aTopo, anchor);
 
 		return this;
@@ -20,7 +20,7 @@ abstract class AttractorTopo extends AttractorObject {
 		}	
 	}
 
-	anchorAt(anchor: IHyperPoint, along: VectorDirection = "RAY"): void {
+	anchorAt(anchor: HyperPoint, along: VectorDirection = "RAY"): void {
 		if (!this.topo) {
 			throw new Error(`ERROR @AttractorTopo.anchorAt(...): Topo path is missing!`);
 		}
@@ -30,15 +30,15 @@ abstract class AttractorTopo extends AttractorObject {
 
 		if (!this.axisLocked) {
 			if (along === "TAN") {
-				if (!anchor.tangent) {
+				if (!anchor.getTangent()) {
 					throw new Error("Attractor anchor missing tangent vector");
 				}
-				this.topo.rotation = anchor.tangent.angle;
+				this.topo.rotation = anchor.getTangent().angle;
 			} else {
-				if (!anchor.normal) {
+				if (!anchor.getNormal()) {
 					throw new Error("Attractor anchor missing normal vector");
 				}
-				this.topo.rotation = anchor.normal.angle;
+				this.topo.rotation = anchor.getNormal().angle;
 			}
 		}
 
@@ -46,7 +46,7 @@ abstract class AttractorTopo extends AttractorObject {
 		this.topo.placeAt(this.anchor.point, this.topo.position);
 	}
 
-	locate(at: number, orient: boolean = false): IHyperPoint {
+	public locate(at: number, orient: boolean = false): HyperPoint {
 		const locationData = this.getTopoLocationAt(at);
 
 		if (locationData) {
@@ -62,7 +62,15 @@ abstract class AttractorTopo extends AttractorObject {
 		}
 	}
 
-	rotate(angle: number) {
+	public scale( hor: number, ver: number ) {
+
+		this.topo.scale( hor, ver );
+		this.setLength(this.topo.length);
+
+		return this;
+	};
+
+	public rotate(angle: number) {
 		if (!this.topo) {
 			throw new Error(`ERROR @AttractorObject.rotate(): path is missing!`);
 		}
@@ -71,6 +79,19 @@ abstract class AttractorTopo extends AttractorObject {
 			this.topo.rotate(angle * this.spin, this.anchor.point);
 			this.setAxisAngle(this.axisAngle + angle);
 		}
+	}
+
+	public moveBy( by: number, along: VectorDirection ) {
+
+		this.anchor.offsetBy( by, along );
+
+		this.topo.placeAt( this.anchor.point );
+
+		return this;
+	};
+
+	public remove() {
+
 	}
 }
 

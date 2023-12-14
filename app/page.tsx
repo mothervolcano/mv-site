@@ -199,7 +199,7 @@ export default function Home() {
                 </ActionIcon>
               </div>
               <div className={styles.introText} style={{ fontFamily: camptonBook.style.fontFamily }}>
-                Porto-based JavaScript developer. Ex-designer. Generative visuals, interaction, and data: the Venn diagram where I'm building my expertise.
+                JavaScript developer. Ex-designer. Based in Porto. Building my expertise at the Venn diagram of generative visuals, interaction, and data.
               </div>
             </div>
           </div>
