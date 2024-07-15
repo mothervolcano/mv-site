@@ -68,11 +68,11 @@ const projectsData = [
   },
   {
     title: "Polystar",
-    description: "A shape creation tool, based on a simple yet versatile model. Soon available as a plugin.",
+    description: "A shape creation Figma plugin, based on a simple yet versatile model.",
     image: thumbPolystar,
     contrast: "LIGHT",
     colors: [COLORS_LIGHT, COLORS_DARK],
-    link: "https://mothervolcano.github.io/polystar-demo/",
+    link: "https://www.figma.com/community/plugin/1392912403830410076/polystar",
     textLinks: [],
     status: "READY",
   },
