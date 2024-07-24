@@ -58,11 +58,11 @@ const projectsData = [
   {
     title: "Hilbert",
     description:
-      "A FASS curve generator based on Hilbert’s model. FASS is the short way of saying: space-filling, self-avoiding, simple and self-similar curve. Soon available as a plugin.",
+      "A FASS curve generator based on Hilbert’s model. FASS is the short way of saying: space-filling, self-avoiding, simple and self-similar curve. Available as a Figma plugin.",
     image: thumbHilbert,
     contrast: "DARK",
     colors: [COLORS_LIGHT, COLORS_DARK],
-    link: "https://mothervolcano.github.io/hilbert-demo/",
+    link: "https://www.figma.com/community/plugin/1397252695423426897/hilbert",
     textLinks: [],
     status: "READY",
   },
