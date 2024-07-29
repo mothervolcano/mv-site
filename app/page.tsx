@@ -87,7 +87,6 @@ const projectsData = [
     textLinks: [],
     status: "ONGOING",
   },
-
   {
     title: "Arborator",
     description:
@@ -99,6 +98,17 @@ const projectsData = [
     textLinks: ["https://github.com/mothervolcano/arborator", "GitHub"],
     status: "ONGOING",
   },
+  // {
+  //   title: "CyberGuard",
+  //   description:
+  //     "Game World for online game. Yadayadayada. Client: Siemens.",
+  //   image: thumbArborator,
+  //   contrast: "DARK",
+  //   colors: [COLORS_LIGHT, COLORS_DARK],
+  //   link: "/projects/cyberguard",
+  //   textLinks: [],
+  //   status: "READY",
+  // },
 ];
 
 export default function Home() {
