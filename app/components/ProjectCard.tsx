@@ -53,7 +53,7 @@ export default function ProjectCard(props: any) {
 								{description}
 								{textLinks[0] && (
 									<>
-										<Anchor>{` ${textLinks[1]}`}</Anchor>.
+										<Anchor href={textLinks[0]}>{` ${textLinks[1]}`}</Anchor>.
 									</>
 								)}
 							</Text>
