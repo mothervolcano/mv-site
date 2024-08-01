@@ -58,7 +58,7 @@ const projectsData = [
   {
     title: "Hilbert",
     description:
-      "A FASS curve generator based on Hilbert’s model. FASS is the short way of saying: space-filling, self-avoiding, simple and self-similar curve. Try it",
+      "A space-filling curve generator for Figma. Try it",
     image: thumbHilbert,
     contrast: "DARK",
     colors: [COLORS_LIGHT, COLORS_DARK],
