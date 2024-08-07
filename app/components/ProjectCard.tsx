@@ -37,7 +37,11 @@ export default function ProjectCard(props: any) {
 						{title}
 					</Title>
 					<Flex direction="column" align="flex-end" p={0}>
-						<ProjectButton variant={contrast} status={status} link={link} />
+						<ProjectButton 
+							variant={contrast} 
+							status={status} 
+							link={link}
+						/>
 						<Container bg={colors[0]} p={0}>
 							<Divider size="xs" color="black" />
 							<Text
@@ -53,7 +57,12 @@ export default function ProjectCard(props: any) {
 								{description}
 								{textLinks[0] && (
 									<>
-										<Anchor href={textLinks[0]}>{` ${textLinks[1]}`}</Anchor>.
+										<Anchor 
+											href={textLinks[0]}
+											target="_blank"
+										>
+											{` ${textLinks[1]}`}
+										</Anchor>.
 									</>
 								)}
 							</Text>

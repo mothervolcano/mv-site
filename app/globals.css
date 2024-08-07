@@ -61,3 +61,10 @@ a {
   text-decoration: none;
 }
 
+.logo {
+    top: 1.75rem;
+    left: 1.75rem;
+    width: 10rem;
+    height: 10rem;
+}
+

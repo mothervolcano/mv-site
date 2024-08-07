@@ -11,7 +11,6 @@ import { camptonLight, camptonBook, camptonMedium, camptonSemiBold, camptonBold 
 
 import PaperStage from "./components/paperStage";
 import ProjectCard from "./components/ProjectCard";
-import Logo from "./components/logo";
 
 import { IconBrandGithub, IconBrandLinkedin } from "@tabler/icons-react";
 
@@ -98,17 +97,17 @@ const projectsData = [
     textLinks: ["https://github.com/mothervolcano/arborator", "GitHub"],
     status: "ONGOING",
   },
-  // {
-  //   title: "CyberGuard",
-  //   description:
-  //     "Game World for online game. Yadayadayada. Client: Siemens.",
-  //   image: thumbArborator,
-  //   contrast: "DARK",
-  //   colors: [COLORS_LIGHT, COLORS_DARK],
-  //   link: "/projects/cyberguard",
-  //   textLinks: [],
-  //   status: "READY",
-  // },
+  {
+    title: "CyberGuard",
+    description:
+      "Game World for online game. Yadayadayada. Client: Siemens.",
+    image: thumbArborator,
+    contrast: "DARK",
+    colors: [COLORS_LIGHT, COLORS_DARK],
+    link: "/projects/cyberguard",
+    textLinks: [],
+    status: "READY",
+  },
 ];
 
 export default function Home() {
@@ -193,7 +192,6 @@ export default function Home() {
                 setPaperLoaded(true);
               }}
             />
-            <Logo className={styles.logo} />
             <div className={styles.intro}>
               <div className={styles.title}>
                 <h1

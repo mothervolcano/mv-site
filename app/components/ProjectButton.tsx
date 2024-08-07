@@ -28,7 +28,7 @@ const ProjectButton = (props: any) => {
 		<ActionIcon
 			component={Link}
 			href={link}
-			target="_blank"
+			target="_self"
 			// onClick={(event) => {event.preventDefault(); console.log("open: ", event.currentTarget.href)}}
 			variant="filled"
 			size="xl"

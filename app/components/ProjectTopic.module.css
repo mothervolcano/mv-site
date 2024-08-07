@@ -1,0 +1,30 @@
+.container {
+	display: flex;
+	border-bottom: solid 1px black;
+}
+
+.container .description {
+	border-right: solid 1px black;
+	flex-basis: 30%;
+	padding: 10rem 1.5rem 0 1.5rem;
+}
+
+.container .content {
+	flex-basis: 70%;
+}
+
+@media (orientation: portrait) and (max-width: 450px) {
+	.container {
+		flex-direction: column;
+	}
+}
+
+@media (orientation: portrait) and (min-width: 450px) {
+	.container .intro {
+		flex-basis: 40%;
+	}
+
+	.container .content {
+		flex-basis: 60%;
+	}
+}

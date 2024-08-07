@@ -1,0 +1,22 @@
+.logo {
+    position: absolute;
+    z-index: 100;
+    top: 1.75rem;
+    left: 1.75rem;
+}
+
+.logoBig {
+    width: 10rem;
+    height: 10rem;
+}
+
+.logoSmall {
+    width: 5rem;
+    height: 5rem;   
+}
+
+.logoBig,
+.logoSmall {
+    transition: all 1s;
+}
+
