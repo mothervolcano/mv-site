@@ -25,7 +25,7 @@ export default function ProjectHeader(props: ProjectHeaderProps) {
 					Drops of rain could be heard hitting the pane, which made him feel quite sad. "How about if I sleep a little bit longer and forget all this nonsense", he thought, but that was something he was unable to do because he was used to sleeping on his right, and in his present state couldn't get into that position. However hard he threw himself onto his right, he always rolled back to where he was.
 				</p>
 			</div>
-			<div className={styles.content} style={{width: "100%", height: "60vh"}}>
+			<div className={styles.content} style={{position: "relative", width: "100%", height: "100%"}}>
 				{children}
 			</div>	
 		</div>

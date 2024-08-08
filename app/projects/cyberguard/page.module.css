@@ -1,0 +1,10 @@
+.overlay-instructions {
+	width: 10rem;
+	height: 10rem;
+	border-radius: 50%;
+	background-color: #000000AA;
+	color: #FFFFFF;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

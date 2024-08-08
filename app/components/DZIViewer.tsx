@@ -36,6 +36,7 @@ export default class DZIViewer extends React.Component<
 				visibilityRatio: 1.0,
 				constrainDuringPan: true,
 				showNavigator: false,
+				showNavigationControl: false,
 			});
 
 			this.viewer.addHandler("zoom", this.testEvent);
